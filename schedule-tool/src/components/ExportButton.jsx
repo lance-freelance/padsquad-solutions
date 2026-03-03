@@ -23,14 +23,14 @@ export function ExportButton({ timelineRef, milestones, anchorDate, dateType, de
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#14133A',
       })
       // Output at 1600×900: scale to fit and center
       const out = document.createElement('canvas')
       out.width = PNG_WIDTH
       out.height = PNG_HEIGHT
       const ctx = out.getContext('2d')
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = '#14133A'
       ctx.fillRect(0, 0, PNG_WIDTH, PNG_HEIGHT)
       const scale = Math.min(PNG_WIDTH / canvas.width, PNG_HEIGHT / canvas.height)
       const w = canvas.width * scale
