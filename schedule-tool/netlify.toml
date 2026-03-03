@@ -6,6 +6,11 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/"
+  to = "/schedule-tool/"
+  status = 302
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
