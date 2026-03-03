@@ -7,118 +7,197 @@ import {
   StyleSheet,
 } from '@react-pdf/renderer'
 
-const navy = '#14133A'
-const pink = '#F0629E'
-const teal = '#84D6E2'
-const gray = '#898A9E'
+const navy   = '#14133A'
+const card   = '#1E1D42'
+const pink   = '#F0629E'
+const teal   = '#84D6E2'
+const divider = '#2D2B5A'
+const white  = '#FFFFFF'
+const muted  = '#898A9E'
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 36,
+    backgroundColor: navy,
     fontFamily: 'Helvetica',
     fontSize: 10,
-    color: navy,
+    color: white,
   },
+
+  /* ── Header ── */
   header: {
-    marginBottom: 24,
-    borderBottomWidth: 2,
-    borderBottomColor: pink,
-    paddingBottom: 12,
+    marginBottom: 20,
   },
-  logoPlaceholder: {
-    width: 120,
-    height: 32,
-    backgroundColor: navy,
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: navy,
+  brand: {
+    fontSize: 7,
+    color: muted,
+    letterSpacing: 2,
     marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 9,
-    color: gray,
-  },
-  section: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 12,
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: navy,
-    marginBottom: 8,
+    color: white,
+    marginBottom: 3,
   },
+  subtitle: {
+    fontSize: 8,
+    color: muted,
+  },
+
+  /* ── Card shell ── */
+  card: {
+    backgroundColor: card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: divider,
+  },
+  cardHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+  },
+  sectionLabel: {
+    fontSize: 7,
+    fontWeight: 'bold',
+    color: pink,
+    letterSpacing: 2.5,
+  },
+
+  /* ── Two-column grid ── */
+  columns: {
+    flexDirection: 'row',
+  },
+  colLeft: {
+    flex: 1,
+  },
+  colRight: {
+    flex: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: divider,
+  },
+
+  /* ── Milestone row ── */
   row: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E6EC',
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderTopWidth: 1,
+    borderTopColor: divider,
   },
-  rowHeader: {
-    flexDirection: 'row',
-    backgroundColor: teal + '30',
-    borderBottomWidth: 1,
-    borderBottomColor: navy,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+  rowFirst: {
+    borderTopWidth: 0,
   },
-  colDate: { width: '22%', textAlign: 'left' },
-  colBD: { width: '12%', textAlign: 'center' },
-  colLabel: { width: '66%', textAlign: 'left' },
+
+  /* ── Date pill badge ── */
+  badge: {
+    borderWidth: 1,
+    borderColor: pink,
+    borderRadius: 999,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 8,
+    paddingRight: 8,
+    minWidth: 68,
+    marginRight: 10,
+  },
+  badgeTeal: {
+    borderColor: teal,
+  },
+  badgeText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: white,
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+
+  /* ── Milestone label ── */
+  label: {
+    fontSize: 9,
+    color: white,
+    flex: 1,
+  },
+
+  /* ── Footer ── */
   footer: {
     position: 'absolute',
-    bottom: 24,
-    left: 40,
-    right: 40,
+    bottom: 20,
+    left: 36,
+    right: 36,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    fontSize: 8,
-    color: gray,
+    fontSize: 7,
+    color: muted,
   },
 })
 
 /**
- * Branded PDF: PadSquad colors, logo placeholder, milestone table.
+ * PdfDocument — matches the on-screen branded dark-navy, two-column,
+ * pill-badge timeline design.
  */
 export function PdfDocument({ milestones = [], anchorDate, dateType, designMode }) {
-  const anchorStr = anchorDate ? format(anchorDate, 'MMM d, yyyy') : '—'
-  const modeStr = dateType === 'go-live' ? 'Go-live' : 'Kick-off'
-  const designStr = designMode === 'client' ? 'Client design' : 'PadSquad design'
+  const anchorStr  = anchorDate ? format(anchorDate, 'MMM d, yyyy') : '—'
+  const modeStr    = dateType === 'go-live' ? 'Go-live' : 'Kick-off'
+  const designStr  = designMode === 'client' ? 'Client design' : 'PadSquad design'
+  const lastIndex  = milestones.length - 1
+
+  const left  = milestones.slice(0, 8)
+  const right = milestones.slice(8)
+
+  const renderRow = (m, globalIndex, localIndex) => {
+    const isLaunch = globalIndex === lastIndex
+    const isFirst  = localIndex === 0
+    return (
+      <View
+        key={`${m.label}-${m.bdOffset}`}
+        style={[styles.row, isFirst && styles.rowFirst]}
+      >
+        <View style={[styles.badge, isLaunch && styles.badgeTeal]}>
+          <Text style={styles.badgeText}>
+            {format(m.date, 'd MMM').toUpperCase()}
+          </Text>
+        </View>
+        <Text style={styles.label}>{m.label}</Text>
+      </View>
+    )
+  }
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" orientation="landscape" style={styles.page}>
+
+        {/* Header */}
         <View style={styles.header}>
-          <View style={styles.logoPlaceholder} />
+          <Text style={styles.brand}>PADSQUAD</Text>
           <Text style={styles.title}>Campaign Timelines & Schedule</Text>
           <Text style={styles.subtitle}>
             {modeStr} date: {anchorStr} · {designStr}
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Production timeline</Text>
-          <View style={styles.rowHeader}>
-            <Text style={styles.colDate}>Date</Text>
-            <Text style={styles.colBD}>BD</Text>
-            <Text style={styles.colLabel}>Milestone</Text>
+        {/* Timeline card */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.sectionLabel}>CAMPAIGN TIMELINE</Text>
           </View>
-          {milestones.map((m, i) => (
-            <View key={i} style={styles.row}>
-              <Text style={styles.colDate}>{format(m.date, 'MMM d, yyyy')}</Text>
-              <Text style={styles.colBD}>{m.bdOffset}</Text>
-              <Text style={styles.colLabel}>{m.label}</Text>
+          <View style={styles.columns}>
+            <View style={styles.colLeft}>
+              {left.map((m, i) => renderRow(m, i, i))}
             </View>
-          ))}
+            <View style={styles.colRight}>
+              {right.map((m, i) => renderRow(m, i + 8, i))}
+            </View>
+          </View>
         </View>
 
+        {/* Footer */}
         <View style={styles.footer}>
           <Text>PadSquad · solutions.padsquad.com</Text>
           <Text>Generated {format(new Date(), 'MMM d, yyyy')}</Text>
         </View>
+
       </Page>
     </Document>
   )
