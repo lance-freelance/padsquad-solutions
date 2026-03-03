@@ -1,0 +1,7 @@
+# PadSquad Solutions Hub — Netlify root config
+# Tells Netlify to build the schedule-tool from its subdirectory
+
+[build]
+  base    = "schedule-tool"
+  command = "npm run build"
+  publish = "dist"
