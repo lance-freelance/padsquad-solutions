@@ -1,7 +1,7 @@
 import { formatNumber, formatCurrency, formatMultiplier, formatCompact, formatCpm } from '../utils/calculations'
 import { useCountUp } from '../hooks/useCountUp'
 
-function HeroStat({ value, label, accent, prefix = '', delay = 0 }) {
+function HeroStat({ value, label, subtitle, accent, prefix = '', delay = 0 }) {
   const animated = useCountUp(value)
   const colorClass =
     accent === 'pink' ? 'text-[var(--ps-pink)]' :
@@ -20,6 +20,9 @@ function HeroStat({ value, label, accent, prefix = '', delay = 0 }) {
     <div className={`ps-card p-5 text-center ps-reveal`} style={{ animationDelay: `${delay}ms` }}>
       <div className={`ps-hero-value ${colorClass}`}>{displayVal}</div>
       <div className="ps-hero-label">{label}</div>
+      {subtitle && (
+        <div className="text-[9px] text-[var(--ps-muted)] tracking-[0.06em] mt-1">{subtitle}</div>
+      )}
     </div>
   )
 }
@@ -56,6 +59,8 @@ export function EfficiencyResults({ results, budget }) {
     traditionalImpressions,
     padsquadImpressions,
     vendorCpm,
+    padsquadAllInCpm,
+    cpmSavings,
   } = results
 
   const maxImps = Math.max(traditionalImpressions, padsquadImpressions, 1)
@@ -79,7 +84,25 @@ export function EfficiencyResults({ results, budget }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={50} />
         <HeroStat value={reachMultiplier} label="Investment Multiplier" accent="teal" delay={150} />
-        <HeroStat value={valueUnlocked} label="Value Unlocked" accent="pink" prefix="$" delay={250} />
+        <HeroStat
+          value={valueUnlocked}
+          label="Savings"
+          subtitle="reinvested as working media"
+          accent="pink"
+          prefix="$"
+          delay={250}
+        />
+      </div>
+
+      {/* CPM savings callout */}
+      <div className="text-center ps-reveal" style={{ animationDelay: '280ms' }}>
+        <span className="inline-flex items-center gap-2 text-xs text-[var(--ps-textSoft)] bg-[rgba(255,255,255,0.04)] rounded-full px-4 py-2">
+          <span className="text-[var(--ps-muted)]">{formatCpm(vendorCpm)}</span>
+          <span className="text-[var(--ps-muted)]">→</span>
+          <span className="text-[var(--ps-teal)] font-semibold">{formatCpm(padsquadAllInCpm)}</span>
+          <span className="text-[var(--ps-muted)]">·</span>
+          <span className="text-[var(--ps-pink)] font-semibold">saving {formatCpm(cpmSavings)} per CPM</span>
+        </span>
       </div>
 
       {/* Comparison bars */}
@@ -91,16 +114,18 @@ export function EfficiencyResults({ results, budget }) {
         </div>
       </div>
 
-      {/* Prominent scenario summary */}
+      {/* Prominent scenario summary — savings → working media narrative */}
       <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
         <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
-          With a {budgetDisplay} budget, AdCanvas delivers{' '}
+          With a {budgetDisplay} budget, AdCanvas reduces your effective CPM from{' '}
+          <span className="text-white font-bold">{formatCpm(vendorCpm)}</span> to{' '}
+          <span className="text-[var(--ps-teal)] font-bold">{formatCpm(padsquadAllInCpm)}</span>{' '}
+          — saving{' '}
+          <span className="text-[var(--ps-pink)] font-bold">{formatCurrency(valueUnlocked)}</span>{' '}
+          that gets reinvested as working media, delivering{' '}
           <span className="text-white font-bold">{formatCompact(padsquadImpressions)}</span>{' '}
           impressions vs.{' '}
-          <span className="text-white font-bold">{formatCompact(traditionalImpressions)}</span>{' '}
-          with a traditional vendor —{' '}
-          <span className="text-[var(--ps-teal)] font-bold text-xl">{formatMultiplier(reachMultiplier)}</span>{' '}
-          the reach for the same investment.
+          <span className="text-white font-bold">{formatCompact(traditionalImpressions)}</span>.
         </p>
       </div>
     </div>

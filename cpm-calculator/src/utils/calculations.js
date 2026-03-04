@@ -32,6 +32,9 @@ export function calculateEfficiency({ budget, vendorCpm, caasCpm, programmaticEc
   // Value unlocked uses full all-in CPM (matches pricing sheet: 12.2M / 1000 × $6.25 = $76,388.89)
   const valueUnlocked = (incrementalImpressions / 1000) * padsquadAllInCpm
 
+  // CPM savings (the root cause of all incremental value)
+  const cpmSavings = vendor - padsquadAllInCpm
+
   // Investment breakdown
   const caasServingFee = (padsquadImpressions / 1000) * caas
   const totalClientCommitment = caasServingFee
@@ -39,6 +42,7 @@ export function calculateEfficiency({ budget, vendorCpm, caasCpm, programmaticEc
   return {
     vendorCpm: vendor,
     padsquadAllInCpm,
+    cpmSavings,
     traditionalImpressions,
     padsquadImpressions,
     incrementalImpressions,
