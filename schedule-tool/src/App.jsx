@@ -4,7 +4,7 @@ import { DatePicker } from './components/DatePicker'
 import { DesignToggle } from './components/DesignToggle'
 import { Timeline } from './components/Timeline'
 import { ExportButton } from './components/ExportButton'
-import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES, ASSET_PRODUCTION_MILESTONES } from './config/milestones'
+import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES, PADSQUAD_ASSETS_MILESTONES, CLIENT_ASSETS_MILESTONES } from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
@@ -20,12 +20,10 @@ function App() {
   const [activeTarget, setActiveTarget] = useState('kick-off')
   const timelineRef = useRef(null)
 
-  // "Assets ready?" overrides the design toggle and uses the asset-production workflow.
-  const milestonesConfig = assetsReady
-    ? ASSET_PRODUCTION_MILESTONES
-    : designMode === 'padSquad'
-      ? PADSQUAD_DESIGN_MILESTONES
-      : CLIENT_DESIGN_MILESTONES
+  // 2×2 matrix: design ownership × asset readiness
+  const milestonesConfig = designMode === 'padSquad'
+    ? (assetsReady ? PADSQUAD_ASSETS_MILESTONES : PADSQUAD_DESIGN_MILESTONES)
+    : (assetsReady ? CLIENT_ASSETS_MILESTONES   : CLIENT_DESIGN_MILESTONES)
 
   const milestones = useMemo(() => {
     if (!date) return []
@@ -115,7 +113,6 @@ function App() {
             <DesignToggle
               designMode={designMode}
               onDesignChange={setDesignMode}
-              assetsReady={assetsReady}
             />
           </div>
         </div>

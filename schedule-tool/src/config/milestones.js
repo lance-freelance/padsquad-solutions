@@ -1,28 +1,22 @@
 /**
  * Milestone configs — all BDs measured from kick-off (BD 0).
  *
- * Toggle "Will you provide the design?"
- *   No  → PADSQUAD_DESIGN_MILESTONES  — PadSquad creates the creative from scratch.
- *          21 BDs: assets → creative dev → 2× creative review →
- *                  demo dev → 2× demo review → QA → launch.
+ * Two axes: design ownership × asset readiness → 4 workflows.
  *
- *   Yes → CLIENT_DESIGN_MILESTONES    — Client supplies an already-approved design.
- *          13 BDs: design files → demo dev → 2× demo review → QA → launch.
+ * Toggle "Client provided design?"
+ *   No  → PadSquad creates the creative.
+ *   Yes → Client supplies an already-approved design.
  *
- * Separate "Assets ready?" toggle (overrides both above):
- *        → ASSET_PRODUCTION_MILESTONES — Production-ready assets in hand;
- *                                        PadSquad reviews layout before building demos.
- *          12 BDs: assets → layout review → demo dev → demo review → QA → launch.
+ * Checkbox "Assets received by PadSquad"
+ *   Unchecked → standard timelines.
+ *   Checked   → expedited timelines (assets in hand, fewer review rounds).
+ *
+ *   No  + No assets  → PADSQUAD_DESIGN_MILESTONES       21 BDs
+ *   No  + Assets     → PADSQUAD_ASSETS_MILESTONES       12 BDs
+ *   Yes + No assets  → CLIENT_DESIGN_MILESTONES         13 BDs
+ *   Yes + Assets     → CLIENT_ASSETS_MILESTONES          8 BDs
  *
  * isClientAction: true = client-owned gate; the schedule slips if missed.
- *
- * Naming conventions (consistent across all three):
- *   Creative phase  — 'Creative {event}'   (PadSquad design path only)
- *   Layout phase    — 'Layout {event}'     (Asset production path only)
- *   Demo phase      — 'Demo {event}'       (all three paths)
- *   Client actions  — always isClientAction: true
- *   Final approval  — 'Client approval'    (all three paths, final step before QA)
- *   Shared anchors  — 'Demo development', 'QA & trafficking', 'Campaign launch'
  */
 
 /**
@@ -67,23 +61,41 @@ export const CLIENT_DESIGN_MILESTONES = [
 ]
 
 /**
- * Assets in hand — triggered by the separate "Assets ready?" toggle.
- * Production-ready assets received; PadSquad creates a layout deck for
- * client review before building demos.
+ * PadSquad designs + assets in hand.
+ * Assets received; PadSquad creates creative layout for review before
+ * building demos. Expedited: 1 creative review round instead of 2.
  * 12 BDs, 12 steps.
  * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
  */
-export const ASSET_PRODUCTION_MILESTONES = [
-  { label: 'Assets received',           bdOffset: 0  },
-  { label: 'Layout deck sent',          bdOffset: 2  },
-  { label: 'Layout feedback due',       bdOffset: 3,  isClientAction: true },
-  { label: 'Revised layout sent',       bdOffset: 4  },
-  { label: 'Layout approved',           bdOffset: 5,  isClientAction: true },
-  { label: 'Demo development',          bdOffset: 6  },
-  { label: 'Demo review R1',            bdOffset: 7,  isClientAction: true },
-  { label: 'Demo feedback due',         bdOffset: 8,  isClientAction: true },
-  { label: 'Demo feedback implemented', bdOffset: 9  },
-  { label: 'Client approval',           bdOffset: 10, isClientAction: true },
-  { label: 'QA & trafficking',          bdOffset: 11 },
-  { label: 'Campaign launch',           bdOffset: 12 },
+export const PADSQUAD_ASSETS_MILESTONES = [
+  { label: 'Assets received',              bdOffset: 0  },
+  { label: 'Creative layout sent',         bdOffset: 2  },
+  { label: 'Creative feedback due',        bdOffset: 3,  isClientAction: true },
+  { label: 'Creative revisions sent',      bdOffset: 4  },
+  { label: 'Creative approval',            bdOffset: 5,  isClientAction: true },
+  { label: 'Demo development',             bdOffset: 6  },
+  { label: 'Demo review R1',               bdOffset: 7,  isClientAction: true },
+  { label: 'Demo feedback due',            bdOffset: 8,  isClientAction: true },
+  { label: 'Demo feedback implemented',    bdOffset: 9  },
+  { label: 'Client approval',              bdOffset: 10, isClientAction: true },
+  { label: 'QA & trafficking',             bdOffset: 11 },
+  { label: 'Campaign launch',              bdOffset: 12 },
+]
+
+/**
+ * Client provides design + assets in hand.
+ * Design files and assets received; PadSquad jumps straight to demo
+ * development. Expedited: 1 demo review round, no R2.
+ * 8 BDs, 8 steps.
+ * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
+ */
+export const CLIENT_ASSETS_MILESTONES = [
+  { label: 'Design files & assets received', bdOffset: 0  },
+  { label: 'Demo development',               bdOffset: 1  },
+  { label: 'Demo review R1',                 bdOffset: 2,  isClientAction: true },
+  { label: 'Demo feedback due',              bdOffset: 3,  isClientAction: true },
+  { label: 'Demo feedback implemented',      bdOffset: 4  },
+  { label: 'Client approval',                bdOffset: 5,  isClientAction: true },
+  { label: 'QA & trafficking',               bdOffset: 7  },
+  { label: 'Campaign launch',                bdOffset: 8  },
 ]
