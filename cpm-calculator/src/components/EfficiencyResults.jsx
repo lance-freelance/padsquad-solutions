@@ -76,16 +76,10 @@ export function EfficiencyResults({ results, budget }) {
       </div>
 
       {/* Hero stat cards — what you unlock */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-4 sm:col-span-2">
-          <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={50} />
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <HeroStat value={reachMultiplier} label="Investment Multiplier" accent="teal" delay={150} />
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <HeroStat value={valueUnlocked} label="Value Unlocked" accent="pink" prefix="$" delay={250} />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={50} />
+        <HeroStat value={reachMultiplier} label="Investment Multiplier" accent="teal" delay={150} />
+        <HeroStat value={valueUnlocked} label="Value Unlocked" accent="pink" prefix="$" delay={250} />
       </div>
 
       {/* Comparison bars */}
