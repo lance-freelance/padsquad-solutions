@@ -1,7 +1,16 @@
 # PadSquad Solutions Hub — Netlify root config
-# Tells Netlify to build the schedule-tool from its subdirectory
+# Builds both sub-apps and merges them under a single publish directory.
 
 [build]
-  base    = "schedule-tool"
   command = "npm run build"
   publish = "dist"
+
+[[redirects]]
+  from   = "/schedule-tool/*"
+  to     = "/schedule-tool/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/cpm-calculator/*"
+  to     = "/cpm-calculator/index.html"
+  status = 200

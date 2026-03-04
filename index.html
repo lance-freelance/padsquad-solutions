@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PadSquad Solutions Hub</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --navy:   #14133A;
+        --surface:#1E1D42;
+        --border: #2D2B5A;
+        --pink:   #F0629E;
+        --teal:   #84D6E2;
+        --text:   #FFFFFF;
+        --soft:   #E8E8F0;
+        --muted:  #898A9E;
+        --font:   system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--navy);
+        color: var(--soft);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .eyebrow {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.625rem;
+      }
+
+      h1 {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 680px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        text-decoration: none;
+        transition: transform 150ms ease, box-shadow 150ms ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      }
+
+      .card__accent {
+        width: 3px;
+        height: 2rem;
+        border-radius: 9999px;
+        margin-bottom: 0.25rem;
+      }
+
+      .card--pink  .card__accent { background: var(--pink); }
+      .card--teal  .card__accent { background: var(--teal); }
+
+      .card__label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+      .card--pink .card__label { color: var(--pink); }
+      .card--teal .card__label { color: var(--teal); }
+
+      .card__title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.3;
+      }
+
+      .card__desc {
+        font-size: 0.825rem;
+        color: var(--muted);
+        line-height: 1.55;
+        flex: 1;
+      }
+
+      .card__cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+      }
+      .card--pink .card__cta { color: var(--pink); }
+      .card--teal .card__cta { color: var(--teal); }
+
+      .card__cta svg { transition: transform 150ms ease; }
+      .card:hover .card__cta svg { transform: translateX(3px); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">PadSquad</p>
+      <h1>Solutions Hub</h1>
+    </header>
+
+    <div class="cards">
+      <a class="card card--pink" href="/schedule-tool/">
+        <div class="card__accent"></div>
+        <div class="card__label">Planning</div>
+        <div class="card__title">Campaign Timelines &amp; Schedule</div>
+        <div class="card__desc">Generate milestone timelines from a kick-off or go-live date, and export a shareable PDF for your team.</div>
+        <div class="card__cta">
+          Open tool
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </a>
+
+      <a class="card card--teal" href="/cpm-calculator/">
+        <div class="card__accent"></div>
+        <div class="card__label">Analytics</div>
+        <div class="card__title">AdCanvas CPM Efficiency Calculator</div>
+        <div class="card__desc">Compare CPM efficiency across ad formats to surface the true value of high-impact placements.</div>
+        <div class="card__cta">
+          Open tool
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </body>
+</html>

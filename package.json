@@ -1,0 +1,7 @@
+{
+  "name": "ps-solutions-hub",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix schedule-tool install && npm --prefix cpm-calculator install && npm --prefix schedule-tool run build && npm --prefix cpm-calculator run build && mkdir -p dist/schedule-tool dist/cpm-calculator && cp -r schedule-tool/dist/. dist/schedule-tool/ && cp -r cpm-calculator/dist/. dist/cpm-calculator/ && cp index.html dist/"
+  }
+}

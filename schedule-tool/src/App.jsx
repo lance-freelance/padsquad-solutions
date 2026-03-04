@@ -21,22 +21,25 @@ function App() {
   })
   const [dateType, setDateType] = useState('kick-off')
   const [designMode, setDesignMode] = useState('padSquad')
+  const [assetsReady, setAssetsReady] = useState(false)
   const [activeTarget, setActiveTarget] = useState('kick-off')
   const timelineRef = useRef(null)
 
-  const milestonesConfig =
-    designMode === 'padSquad'        ? PADSQUAD_DESIGN_MILESTONES :
-    designMode === 'assetProduction' ? ASSET_PRODUCTION_MILESTONES :
-                                       CLIENT_DESIGN_MILESTONES
+  // "Assets ready?" overrides the design toggle and uses the asset-production workflow.
+  const milestonesConfig = assetsReady
+    ? ASSET_PRODUCTION_MILESTONES
+    : designMode === 'padSquad'
+      ? PADSQUAD_DESIGN_MILESTONES
+      : CLIENT_DESIGN_MILESTONES
 
   const milestones = useMemo(() => {
     if (!date) return []
     if (dateType === 'kick-off') {
       return getMilestoneDatesFromKickOff(date, milestonesConfig)
     }
-    const totalBD = milestonesConfig[milestonesConfig.length - 1]?.bdOffset ?? 28
+    const totalBD = milestonesConfig[milestonesConfig.length - 1]?.bdOffset ?? 21
     return getMilestoneDatesFromGoLive(date, totalBD, milestonesConfig)
-  }, [date, dateType, designMode, milestonesConfig])
+  }, [date, dateType, designMode, assetsReady, milestonesConfig])
 
   const kickOffDate = milestones?.[0]?.date
   const goLiveDate = milestones?.[milestones.length - 1]?.date
@@ -106,7 +109,12 @@ function App() {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <DesignToggle value={designMode} onChange={setDesignMode} />
+            <DesignToggle
+              designMode={designMode}
+              onDesignChange={setDesignMode}
+              assetsReady={assetsReady}
+              onAssetsChange={setAssetsReady}
+            />
           </div>
         </div>
 

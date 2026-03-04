@@ -1,46 +1,65 @@
 /**
- * Segmented 3-way control for selecting the production workflow mode.
- * Values: 'padSquad' | 'client' | 'assetProduction'
+ * Two independent toggles:
+ *   1. "Provide design?" No / Yes
+ *      No  → PadSquad designs (21 BDs, full creative + demo cycle)
+ *      Yes → Client provides approved design (13 BDs, demo build only)
+ *
+ *   2. "Assets ready?" No / Yes
+ *      Yes → Overrides design toggle; uses asset-production workflow (12 BDs)
+ *            Design toggle is dimmed when assets are ready.
  */
+export function DesignToggle({ designMode, onDesignChange, assetsReady, onAssetsChange }) {
+  const isClientDesign = designMode === 'client'
 
-const OPTIONS = [
-  { value: 'padSquad',        label: 'PadSquad Design' },
-  { value: 'client',          label: 'Client Design'   },
-  { value: 'assetProduction', label: 'Assets In Hand'  },
-]
-
-export function DesignToggle({ value, onChange }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase whitespace-nowrap">
-        Workflow
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+
+      {/* Toggle 1 — Will the client provide the design? */}
+      <div className={`flex items-center gap-3 transition-opacity duration-200 ${assetsReady ? 'opacity-35 pointer-events-none select-none' : ''}`}>
+        <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase whitespace-nowrap">
+          Provide design?
+        </div>
+        <button
+          type="button"
+          onClick={() => onDesignChange(isClientDesign ? 'padSquad' : 'client')}
+          className="ps-toggle"
+          aria-pressed={isClientDesign}
+          tabIndex={assetsReady ? -1 : 0}
+        >
+          <span className="ps-toggle__track" aria-hidden>
+            <span className={`ps-toggle__thumb ${isClientDesign ? 'ps-toggle__thumb--right' : ''}`} />
+          </span>
+          <span className="ps-toggle__labels">
+            <span className={`ps-toggle__label ${!isClientDesign ? 'ps-toggle__label--active' : ''}`}>No</span>
+            <span className={`ps-toggle__label ${isClientDesign ? 'ps-toggle__label--active' : ''}`}>Yes</span>
+          </span>
+        </button>
       </div>
-      <div
-        className="flex rounded-lg overflow-hidden border border-[var(--ps-divider)] bg-[rgba(255,255,255,0.04)]"
-        role="group"
-        aria-label="Workflow mode"
-      >
-        {OPTIONS.map((opt, i) => {
-          const isActive = value === opt.value
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onChange(opt.value)}
-              aria-pressed={isActive}
-              className={[
-                'px-3 py-1.5 text-[11px] font-semibold tracking-[0.1em] uppercase whitespace-nowrap transition-all',
-                i > 0 ? 'border-l border-[var(--ps-divider)]' : '',
-                isActive
-                  ? 'bg-[var(--ps-teal)] text-[var(--ps-bg)] shadow-inner'
-                  : 'text-[var(--ps-muted)] hover:text-white hover:bg-[rgba(255,255,255,0.07)]',
-              ].join(' ')}
-            >
-              {opt.label}
-            </button>
-          )
-        })}
+
+      {/* Divider */}
+      <div className="hidden sm:block w-px h-5 bg-[var(--ps-divider)]" />
+
+      {/* Toggle 2 — Are assets already in hand? */}
+      <div className="flex items-center gap-3">
+        <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase whitespace-nowrap">
+          Assets ready?
+        </div>
+        <button
+          type="button"
+          onClick={() => onAssetsChange(!assetsReady)}
+          className="ps-toggle"
+          aria-pressed={assetsReady}
+        >
+          <span className="ps-toggle__track" aria-hidden>
+            <span className={`ps-toggle__thumb ${assetsReady ? 'ps-toggle__thumb--right' : ''}`} />
+          </span>
+          <span className="ps-toggle__labels">
+            <span className={`ps-toggle__label ${!assetsReady ? 'ps-toggle__label--active' : ''}`}>No</span>
+            <span className={`ps-toggle__label ${assetsReady ? 'ps-toggle__label--active' : ''}`}>Yes</span>
+          </span>
+        </button>
       </div>
+
     </div>
   )
 }
