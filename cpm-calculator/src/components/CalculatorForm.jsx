@@ -1,94 +1,121 @@
-import { CAAS_CPM, DEFAULT_PRODUCTION_FEE } from '../utils/calculations';
+import { FIELD_CONFIG } from '../utils/config'
+import { formatCpm } from '../utils/calculations'
 
-export default function CalculatorForm({ values, onChange }) {
-  const handle = (field) => (e) => {
-    const raw = e.target.value;
-    onChange({ ...values, [field]: raw === '' ? '' : Number(raw) });
-  };
+function InputField({ field, value, onChange, accent, disabled }) {
+  const cfg = FIELD_CONFIG[field]
+  const numVal = value === '' ? '' : Number(value)
 
   return (
-    <div className="ps-card p-6 space-y-5">
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--ps-muted)]">
-        Campaign Inputs
-      </h2>
+    <div className="mb-4">
+      <label className="ps-label">{cfg.label}</label>
+      <input
+        type="number"
+        className="ps-input"
+        value={value}
+        min={cfg.min}
+        max={cfg.max}
+        step={cfg.step}
+        disabled={disabled}
+        placeholder={String(cfg.min)}
+        onChange={(e) => onChange(field, e.target.value === '' ? '' : Number(e.target.value))}
+      />
+      <input
+        type="range"
+        className={`ps-range ${accent === 'teal' ? 'ps-range--teal' : ''}`}
+        value={numVal === '' ? cfg.min : numVal}
+        min={cfg.min}
+        max={cfg.max}
+        step={cfg.step}
+        disabled={disabled}
+        onChange={(e) => onChange(field, Number(e.target.value))}
+      />
+    </div>
+  )
+}
 
-      <div>
-        <label className="ps-label" htmlFor="budget">Total Campaign Budget ($)</label>
-        <input
-          id="budget"
-          className="ps-input"
-          type="number"
-          min="0"
-          step="1000"
-          placeholder="e.g. 500000"
-          value={values.budget}
-          onChange={handle('budget')}
-        />
+export function CalculatorForm({ values, onChange, showAdvanced, onToggleAdvanced }) {
+  const tradAllIn = (Number(values.competitorServingCpm) || 0) + (Number(values.traditionalMediaCpm) || 0)
+  const psAllIn = (Number(values.caasCpm) || 0) + (Number(values.independentMediaCpm) || 0)
+
+  return (
+    <div className="ps-card overflow-hidden">
+      {/* Budget — full width */}
+      <div className="px-6 pt-6 pb-4">
+        <InputField field="budget" value={values.budget} onChange={onChange} />
       </div>
 
-      <div>
-        <label className="ps-label" htmlFor="currentCpm">Current All-In CPM ($)</label>
-        <input
-          id="currentCpm"
-          className="ps-input"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="e.g. 25.00"
-          value={values.currentAllInCpm}
-          onChange={handle('currentAllInCpm')}
-        />
-      </div>
+      {/* Two-column comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {/* Traditional column */}
+        <div className="px-6 pb-6 border-t border-[var(--ps-divider)]">
+          <div className="ps-col-header ps-col-header--gray pt-4">Traditional Vendor</div>
+          <InputField field="competitorServingCpm" value={values.competitorServingCpm} onChange={onChange} />
+          <InputField field="competitorProdFee" value={values.competitorProdFee} onChange={onChange} />
+          <InputField field="traditionalMediaCpm" value={values.traditionalMediaCpm} onChange={onChange} />
+          <div className="ps-allin">
+            <div className="ps-allin__label">All-In CPM</div>
+            <div className="ps-allin__value">{formatCpm(tradAllIn)}</div>
+          </div>
+        </div>
 
-      <div>
-        <label className="ps-label" htmlFor="independentCpm">Independent Media CPM ($)</label>
-        <input
-          id="independentCpm"
-          className="ps-input"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="e.g. 8.00"
-          value={values.independentCpm}
-          onChange={handle('independentCpm')}
-        />
-      </div>
+        {/* PadSquad column */}
+        <div className="px-6 pb-6 border-t border-[var(--ps-divider)] md:border-l">
+          <div className="ps-col-header ps-col-header--pink pt-4">PadSquad AdCanvas</div>
 
-      <div className="pt-3 border-t border-[var(--ps-divider)]">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--ps-muted)] mb-3">
-          AdCanvas Fees
-        </h3>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="ps-label" htmlFor="caasCpm">CaaS Serving CPM ($)</label>
-            <input
-              id="caasCpm"
-              className="ps-input"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder={String(CAAS_CPM)}
-              value={values.caasCpm}
-              onChange={handle('caasCpm')}
-            />
+          {/* CaaS fee — locked by default */}
+          <div className="mb-4">
+            <label className="ps-label">{FIELD_CONFIG.caasCpm.label}</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                className="ps-input"
+                value={values.caasCpm}
+                min={FIELD_CONFIG.caasCpm.min}
+                max={FIELD_CONFIG.caasCpm.max}
+                step={FIELD_CONFIG.caasCpm.step}
+                disabled={!showAdvanced}
+                onChange={(e) => onChange('caasCpm', e.target.value === '' ? '' : Number(e.target.value))}
+              />
+              {!showAdvanced && (
+                <span className="text-[10px] text-[var(--ps-muted)] tracking-[0.08em] whitespace-nowrap flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" className="opacity-50">
+                    <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  FIXED
+                </span>
+              )}
+            </div>
+            {showAdvanced && (
+              <input
+                type="range"
+                className="ps-range ps-range--teal"
+                value={values.caasCpm}
+                min={FIELD_CONFIG.caasCpm.min}
+                max={FIELD_CONFIG.caasCpm.max}
+                step={FIELD_CONFIG.caasCpm.step}
+                onChange={(e) => onChange('caasCpm', Number(e.target.value))}
+              />
+            )}
+            <button
+              type="button"
+              onClick={onToggleAdvanced}
+              className="mt-1 text-[10px] tracking-[0.08em] text-[var(--ps-muted)] hover:text-[var(--ps-pink)] transition-colors uppercase"
+            >
+              {showAdvanced ? '← Standard' : 'Advanced'}
+            </button>
           </div>
 
-          <div>
-            <label className="ps-label" htmlFor="productionFee">Production Fee ($)</label>
-            <input
-              id="productionFee"
-              className="ps-input"
-              type="number"
-              min="0"
-              step="100"
-              placeholder={String(DEFAULT_PRODUCTION_FEE)}
-              value={values.productionFee}
-              onChange={handle('productionFee')}
-            />
+          <InputField field="independentMediaCpm" value={values.independentMediaCpm} onChange={onChange} accent="teal" />
+          <InputField field="padsquadProdFee" value={values.padsquadProdFee} onChange={onChange} accent="teal" />
+          <div className="ps-allin">
+            <div className="ps-allin__label">All-In CPM</div>
+            <div className="ps-allin__value ps-allin__value--pink">{formatCpm(psAllIn)}</div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
+
+export default CalculatorForm

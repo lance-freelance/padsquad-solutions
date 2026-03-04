@@ -1,39 +1,44 @@
-import { formatCurrency } from '../utils/calculations';
+import { formatCurrency, formatNumber } from '../utils/calculations'
 
-export default function InvestmentSummary({ results }) {
-  if (!results) return null;
+export function InvestmentSummary({ results }) {
+  if (!results) return null
 
   const rows = [
-    { label: 'CaaS Serving Fee', value: formatCurrency(results.caasServingFee) },
-    { label: 'Production Fee', value: formatCurrency(results.productionFee) },
-  ];
+    { label: 'Contracted Impressions', value: formatNumber(results.padsquadImpressions) },
+    { label: 'AdCanvas Serving Fee', value: formatCurrency(results.caasServingFee) },
+    { label: 'Production Fee', value: formatCurrency(results.padsquadProdFee) },
+  ]
 
   return (
     <div className="ps-card overflow-hidden">
-      <div className="ps-ds-panel-header flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="5" width="20" height="14" rx="2" />
-          <line x1="2" y1="10" x2="22" y2="10" />
-        </svg>
-        AdCanvas Investment Summary
+      <div className="px-6 pt-5 pb-3">
+        <div className="text-xs tracking-[0.18em] font-semibold text-[var(--ps-pink)] uppercase">
+          Your AdCanvas Investment
+        </div>
       </div>
-      <div className="p-6 space-y-4">
+      <div className="px-6 pb-6 space-y-3">
         {rows.map((r) => (
           <div key={r.label} className="flex items-center justify-between">
             <span className="text-sm text-[var(--ps-textSoft)]">{r.label}</span>
-            <span className="text-sm font-semibold text-white">{r.value}</span>
+            <span className="text-sm font-semibold text-white tabular-nums">{r.value}</span>
           </div>
         ))}
 
         <div className="border-t border-[var(--ps-divider)] pt-4 flex items-center justify-between">
-          <span className="text-sm font-bold uppercase tracking-wider text-[var(--ps-muted)]">
-            Total Client Commitment (IO Anchor)
+          <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--ps-muted)]">
+            Total Client Commitment
           </span>
-          <span className="text-xl font-bold text-[var(--ps-pink)]">
+          <span className="text-xl font-bold text-[var(--ps-pink)] tabular-nums">
             {formatCurrency(results.totalClientCommitment)}
           </span>
         </div>
+
+        <p className="text-[10px] text-[var(--ps-muted)] tracking-[0.04em] mt-2">
+          Media buy is managed independently at standard market rates.
+        </p>
       </div>
     </div>
-  );
+  )
 }
+
+export default InvestmentSummary

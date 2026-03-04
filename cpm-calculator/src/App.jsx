@@ -1,66 +1,57 @@
-import { useState, useRef, useMemo } from 'react';
-import CalculatorForm from './components/CalculatorForm';
-import EfficiencyResults from './components/EfficiencyResults';
-import InvestmentSummary from './components/InvestmentSummary';
-import ResultsExport from './components/ResultsExport';
-import { calculateEfficiency, CAAS_CPM, DEFAULT_PRODUCTION_FEE } from './utils/calculations';
+import { useState, useRef, useMemo } from 'react'
+import { CalculatorForm } from './components/CalculatorForm'
+import { EfficiencyResults } from './components/EfficiencyResults'
+import { InvestmentSummary } from './components/InvestmentSummary'
+import { ResultsExport } from './components/ResultsExport'
+import { calculateEfficiency } from './utils/calculations'
+import { TAB_DEFAULTS } from './utils/config'
 
 const TABS = [
   { id: 'display', label: 'Display / Rich Media' },
   { id: 'video', label: 'Video' },
-];
-
-const INITIAL_VALUES = {
-  budget: '',
-  currentAllInCpm: '',
-  independentCpm: '',
-  caasCpm: CAAS_CPM,
-  productionFee: DEFAULT_PRODUCTION_FEE,
-};
+]
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('display');
+  const [activeTab, setActiveTab] = useState('display')
   const [formValues, setFormValues] = useState({
-    display: { ...INITIAL_VALUES },
-    video: { ...INITIAL_VALUES },
-  });
+    display: { ...TAB_DEFAULTS.display },
+    video: { ...TAB_DEFAULTS.video },
+  })
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const resultsRef = useRef(null)
 
-  const resultsRef = useRef(null);
+  const values = formValues[activeTab]
 
-  const values = formValues[activeTab];
-
-  const setValues = (next) => {
-    setFormValues((prev) => ({ ...prev, [activeTab]: next }));
-  };
+  const handleChange = (field, value) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], [field]: value },
+    }))
+  }
 
   const results = useMemo(() => {
-    const { budget, currentAllInCpm, independentCpm, caasCpm, productionFee } = values;
-    return calculateEfficiency(
-      budget,
-      currentAllInCpm,
-      independentCpm,
-      {
-        caasCpm: caasCpm === '' ? CAAS_CPM : caasCpm,
-        productionFee: productionFee === '' ? DEFAULT_PRODUCTION_FEE : productionFee,
-      }
-    );
-  }, [values]);
+    return calculateEfficiency(values)
+  }, [values])
 
   return (
-    <div className="min-h-screen py-10 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[var(--ps-bg)]">
+      <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6">
         {/* Header */}
-        <header className="text-center space-y-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            AdCanvas CPM Efficiency Calculator
-          </h1>
-          <p className="text-sm text-[var(--ps-muted)] max-w-xl mx-auto">
-            Compare traditional all-in CPM to independent media CPM and quantify the efficiency gained through AdCanvas.
-          </p>
-        </header>
-
-        {/* Tabs */}
-        <div className="flex justify-center">
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <svg width="36" height="34" viewBox="0 0 43 47" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PadSquad" className="flex-shrink-0">
+              <defs>
+                <linearGradient id="ps-logo-grad" x2="1" y1=".5" y2=".5" gradientUnits="objectBoundingBox">
+                  <stop offset="0" stopColor="#9f6bad"/>
+                  <stop offset="1" stopColor="#ed609d"/>
+                </linearGradient>
+              </defs>
+              <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
+            </svg>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-white">
+              AdCanvas CPM Efficiency Calculator
+            </h1>
+          </div>
           <div className="ps-tab-bar">
             {TABS.map((tab) => (
               <button
@@ -78,26 +69,34 @@ export default function App() {
           </div>
         </div>
 
-        {/* Main layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-6 items-start">
-          {/* Left: form */}
-          <CalculatorForm values={values} onChange={setValues} />
+        {/* Calculator form */}
+        <section className="mb-8">
+          <CalculatorForm
+            values={values}
+            onChange={handleChange}
+            showAdvanced={showAdvanced}
+            onToggleAdvanced={() => setShowAdvanced((p) => !p)}
+          />
+        </section>
 
-          {/* Right: results (export target) */}
-          <div className="space-y-6">
-            <div ref={resultsRef} className="space-y-6">
-              <EfficiencyResults results={results} />
-              <InvestmentSummary results={results} />
-            </div>
-
-            {results && (
-              <div className="flex justify-end">
-                <ResultsExport targetRef={resultsRef} />
-              </div>
-            )}
+        {/* Results (export target) */}
+        <section className="space-y-6">
+          <div ref={resultsRef} className="space-y-6">
+            <EfficiencyResults results={results} budget={values.budget} />
+            <InvestmentSummary results={results} />
           </div>
-        </div>
-      </div>
+
+          {/* Footer bar */}
+          {results && (
+            <div className="ps-footer-bar">
+              <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase">
+                AdCanvas CPM Calculator
+              </div>
+              <ResultsExport targetRef={resultsRef} activeTab={activeTab} />
+            </div>
+          )}
+        </section>
+      </main>
     </div>
-  );
+  )
 }
