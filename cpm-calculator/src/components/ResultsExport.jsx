@@ -6,21 +6,26 @@ export function ResultsExport({ targetRef, activeTab }) {
 
   const dateStr = new Date().toISOString().slice(0, 10)
   const tabLabel = activeTab === 'video' ? 'Video' : 'Display'
-  const filename = `PadSquad_CPM_Efficiency_${tabLabel}_${dateStr}.png`
+  const filename = `PadSquad_AdCanvas_Efficiency_${tabLabel}_${dateStr}.png`
 
   const handleExport = useCallback(async () => {
     if (!targetRef.current) return
     setExporting(true)
     try {
+      // Toggle export mode — shows branded header/footer, hides tuner
+      targetRef.current.classList.add('ps-exporting')
       const canvas = await html2canvas(targetRef.current, {
         backgroundColor: '#14133A',
         scale: 2,
       })
+      targetRef.current.classList.remove('ps-exporting')
+
       const link = document.createElement('a')
       link.download = filename
       link.href = canvas.toDataURL('image/png')
       link.click()
     } finally {
+      targetRef.current?.classList.remove('ps-exporting')
       setExporting(false)
     }
   }, [targetRef, filename])

@@ -282,6 +282,20 @@ html, body {
   }
 }
 
+/* ---- Export mode ---- */
+.ps-export-only {
+  display: none;
+}
+.ps-exporting .ps-export-only {
+  display: flex;
+}
+.ps-exporting .ps-hide-on-export {
+  display: none;
+}
+.ps-exporting {
+  padding: 32px;
+}
+
 /* ---- Reveal animation ---- */
 @keyframes revealUp {
   from { opacity: 0; transform: translateY(24px); }
