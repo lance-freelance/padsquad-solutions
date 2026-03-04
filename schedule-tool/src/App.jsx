@@ -4,7 +4,7 @@ import { DatePicker } from './components/DatePicker'
 import { DesignToggle } from './components/DesignToggle'
 import { Timeline } from './components/Timeline'
 import { ExportButton } from './components/ExportButton'
-import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES } from './config/milestones'
+import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES, ASSET_PRODUCTION_MILESTONES } from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
@@ -25,7 +25,9 @@ function App() {
   const timelineRef = useRef(null)
 
   const milestonesConfig =
-    designMode === 'padSquad' ? PADSQUAD_DESIGN_MILESTONES : CLIENT_DESIGN_MILESTONES
+    designMode === 'padSquad'        ? PADSQUAD_DESIGN_MILESTONES :
+    designMode === 'assetProduction' ? ASSET_PRODUCTION_MILESTONES :
+                                       CLIENT_DESIGN_MILESTONES
 
   const milestones = useMemo(() => {
     if (!date) return []

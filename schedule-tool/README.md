@@ -39,4 +39,4 @@ Configured for Netlify (`netlify.toml`). SPA redirects ensure client-side routin
 - **Asset checklist**: Deliverables list per design path.
 - **Export**: PDF (branded) and PNG (1600×900, timeline section).
 
-Design tokens live in `src/tokens.css` (navy, pink, teal, gray) and are shared with the AdCanvas CPM Calculator.
+Design tokens and optional components live in the shared PadSquad design system: `../shared/design-system.css` (see that folder’s README). This app imports it and uses navy, pink, teal, gray; the same file is used by CPM Calculator and Ad Experience Planner.

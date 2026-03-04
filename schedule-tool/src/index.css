@@ -1,4 +1,4 @@
-@import './tokens.css';
+@import '../../shared/design-system.css';
 
 @tailwind base;
 @tailwind components;
@@ -7,8 +7,8 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background: var(--color-navy);
-  color: #E8E8F0;
+  background: var(--color-bg-dark);
+  color: var(--color-text-soft);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -22,17 +22,18 @@ html, body {
   min-height: 100%;
 }
 
+/* Thin alias layer: app-specific names that map to design-system tokens */
 @layer base {
   :root {
-    --ps-bg: #14133A;
-    --ps-card: #1E1D42;
-    --ps-text: #FFFFFF;
-    --ps-textSoft: #E8E8F0;
-    --ps-muted: #898A9E;
-    --ps-pink: #F0629E;
-    --ps-teal: #84D6E2;
+    --ps-bg: var(--color-bg-dark);
+    --ps-card: var(--color-surface-dark);
+    --ps-text: var(--color-text-inverse);
+    --ps-textSoft: var(--color-text-soft);
+    --ps-muted: var(--color-text-muted);
+    --ps-pink: var(--color-accent);
+    --ps-teal: var(--color-accent-secondary);
     --ps-range: rgba(107, 94, 205, 0.25);
-    --ps-divider: #2D2B5A;
+    --ps-divider: var(--color-border-dark);
   }
 }
 
