@@ -1,34 +1,61 @@
 import { FIELD_CONFIG } from '../utils/config'
 import { formatCpm } from '../utils/calculations'
 
-export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced }) {
+function SliderTicks({ values }) {
+  return (
+    <div className="flex justify-between mt-1">
+      {values.map((v, i) => (
+        <span key={i} className="text-[10px] text-[var(--ps-muted)]">{v}</span>
+      ))}
+    </div>
+  )
+}
+
+function ecpmTicks(max) {
+  if (max <= 6) return ['$1', '$2', '$3', '$4', '$5', '$6'].slice(0, max)
+  if (max <= 10) {
+    const ticks = []
+    for (let v = 1; v <= max; v += 2) ticks.push('$' + v)
+    if (max % 2 === 0) ticks.push('$' + max)
+    return ticks
+  }
+  return ['$1', '$5', '$10', '$15', '$20', '$25', '$30'].filter(t => {
+    const n = Number(t.replace('$', ''))
+    return n <= max
+  }).concat(max % 5 !== 0 ? ['$' + max] : [])
+}
+
+const CAAS_TICKS = ['$1', '$2', '$3', '$4', '$5']
+
+export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced, vendorCpm }) {
+  // eCPM can't exceed vendor rate
+  const maxEcpm = Math.min(FIELD_CONFIG.programmaticEcpm.max, vendorCpm || 25)
+  const effectiveEcpm = Math.min(Number(values.programmaticEcpm) || 0, maxEcpm)
+
   return (
     <div className="ps-card p-6 ps-reveal" style={{ animationDelay: '500ms' }}>
       <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-teal)] uppercase mb-6">
         Fine-Tune Your AdCanvas Model
       </div>
 
-      {/* Programmatic eCPM */}
+      {/* Programmatic eCPM — capped at vendor rate */}
       <div className="mb-6">
         <div className="flex items-baseline justify-between mb-3">
           <label className="ps-label mb-0">{FIELD_CONFIG.programmaticEcpm.label}</label>
           <span className="text-xl font-bold text-white tabular-nums">
-            {formatCpm(Number(values.programmaticEcpm) || 0)}
+            {formatCpm(effectiveEcpm)}
           </span>
         </div>
         <input
           type="range"
           className="ps-range ps-range--teal"
-          value={values.programmaticEcpm}
+          value={effectiveEcpm}
           min={FIELD_CONFIG.programmaticEcpm.min}
-          max={FIELD_CONFIG.programmaticEcpm.max}
+          max={maxEcpm}
           step={FIELD_CONFIG.programmaticEcpm.step}
           onChange={(e) => onChange('programmaticEcpm', Number(e.target.value))}
         />
-        <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-[var(--ps-muted)]">$1</span>
-          <span className="text-[10px] text-[var(--ps-muted)]">$25</span>
-        </div>
+        <SliderTicks values={ecpmTicks(maxEcpm)} />
       </div>
 
       {/* CaaS Fee — fixed by default */}
@@ -71,10 +98,7 @@ export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced }) 
               step={FIELD_CONFIG.caasCpm.step}
               onChange={(e) => onChange('caasCpm', Number(e.target.value))}
             />
-            <div className="flex justify-between mt-1">
-              <span className="text-[10px] text-[var(--ps-muted)]">$0.50</span>
-              <span className="text-[10px] text-[var(--ps-muted)]">$5.00</span>
-            </div>
+            <SliderTicks values={CAAS_TICKS} />
           </div>
         )}
       </div>

@@ -99,6 +99,7 @@ export default function App() {
                 onChange={handleChange}
                 showAdvanced={showAdvanced}
                 onToggleAdvanced={() => setShowAdvanced((p) => !p)}
+                vendorCpm={values.vendorCpm}
               />
               <InvestmentSummary results={results} />
             </div>

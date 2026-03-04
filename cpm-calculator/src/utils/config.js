@@ -22,7 +22,7 @@ export const TAB_DEFAULTS = {
 
 export const FIELD_CONFIG = {
   budget:           { min: 25000, max: 2000000, step: 25000, label: 'Total Campaign Budget' },
-  vendorCpm:        { min: 5, max: 50, step: 0.5, label: 'High-Impact Vendor CPM' },
+  vendorCpm:        { min: 5, max: 30, step: 0.5, label: 'High-Impact Vendor CPM' },
   caasCpm:          { min: 0.5, max: 5.0, step: 0.25, label: 'AdCanvas CaaS Fee' },
   programmaticEcpm: { min: 1, max: 25, step: 0.5, label: 'Programmatic Media eCPM' },
 }

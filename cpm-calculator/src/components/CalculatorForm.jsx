@@ -1,6 +1,19 @@
 import { FIELD_CONFIG } from '../utils/config'
 import { formatCurrency, formatCpm } from '../utils/calculations'
 
+const BUDGET_TICKS = ['$25K', '$500K', '$1M', '$1.5M', '$2M']
+const VENDOR_TICKS = ['$5', '$10', '$15', '$20', '$25', '$30']
+
+function SliderTicks({ values }) {
+  return (
+    <div className="flex justify-between mt-1">
+      {values.map((v, i) => (
+        <span key={i} className="text-[10px] text-[var(--ps-muted)]">{v}</span>
+      ))}
+    </div>
+  )
+}
+
 export function CalculatorForm({ values, onChange, onReveal, revealed }) {
   return (
     <div className="ps-card p-6 sm:p-8">
@@ -25,10 +38,7 @@ export function CalculatorForm({ values, onChange, onReveal, revealed }) {
           step={FIELD_CONFIG.budget.step}
           onChange={(e) => onChange('budget', Number(e.target.value))}
         />
-        <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-[var(--ps-muted)]">$25K</span>
-          <span className="text-[10px] text-[var(--ps-muted)]">$2M</span>
-        </div>
+        <SliderTicks values={BUDGET_TICKS} />
       </div>
 
       {/* Vendor CPM */}
@@ -48,10 +58,7 @@ export function CalculatorForm({ values, onChange, onReveal, revealed }) {
           step={FIELD_CONFIG.vendorCpm.step}
           onChange={(e) => onChange('vendorCpm', Number(e.target.value))}
         />
-        <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-[var(--ps-muted)]">$5</span>
-          <span className="text-[10px] text-[var(--ps-muted)]">$50</span>
-        </div>
+        <SliderTicks values={VENDOR_TICKS} />
       </div>
 
       {/* Reveal CTA */}

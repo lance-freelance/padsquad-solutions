@@ -1,4 +1,4 @@
-import { formatNumber, formatCurrency, formatMultiplier, formatCompact } from '../utils/calculations'
+import { formatNumber, formatCurrency, formatMultiplier, formatCompact, formatCpm } from '../utils/calculations'
 import { useCountUp } from '../hooks/useCountUp'
 
 function HeroStat({ value, label, accent, prefix = '', delay = 0 }) {
@@ -55,6 +55,7 @@ export function EfficiencyResults({ results, budget }) {
     valueUnlocked,
     traditionalImpressions,
     padsquadImpressions,
+    vendorCpm,
   } = results
 
   const maxImps = Math.max(traditionalImpressions, padsquadImpressions, 1)
@@ -62,38 +63,52 @@ export function EfficiencyResults({ results, budget }) {
 
   return (
     <div className="space-y-5">
-      {/* Hero stat cards */}
+      {/* What you get now — minimized baseline */}
+      <div className="text-center py-3 ps-reveal" style={{ animationDelay: '0ms' }}>
+        <div className="text-[10px] font-bold tracking-[0.14em] text-[var(--ps-muted)] uppercase mb-1">
+          Your Current Plan
+        </div>
+        <div className="text-sm text-[var(--ps-textSoft)]">
+          <span className="font-semibold text-white">{formatCompact(traditionalImpressions)}</span>{' '}
+          impressions at{' '}
+          <span className="font-semibold text-white">{formatCpm(vendorCpm)}</span> CPM
+        </div>
+      </div>
+
+      {/* Hero stat cards — what you unlock */}
       <div className="grid grid-cols-4 gap-4">
         <div className="col-span-4 sm:col-span-2">
-          <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={0} />
+          <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={50} />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <HeroStat value={reachMultiplier} label="Reach Multiplier" accent="teal" delay={100} />
+          <HeroStat value={reachMultiplier} label="Investment Multiplier" accent="teal" delay={150} />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <HeroStat value={valueUnlocked} label="Value Unlocked" accent="pink" prefix="$" delay={200} />
+          <HeroStat value={valueUnlocked} label="Value Unlocked" accent="pink" prefix="$" delay={250} />
         </div>
       </div>
 
       {/* Comparison bars */}
-      <div className="ps-card p-5 ps-reveal" style={{ animationDelay: '250ms' }}>
+      <div className="ps-card p-5 ps-reveal" style={{ animationDelay: '300ms' }}>
         <div className="ps-col-header ps-col-header--gray mb-4">Impression Comparison</div>
         <div className="space-y-3">
-          <ComparisonBar label="Traditional" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={300} />
-          <ComparisonBar label="AdCanvas" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={350} />
+          <ComparisonBar label="Traditional" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={350} />
+          <ComparisonBar label="AdCanvas" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
         </div>
       </div>
 
-      {/* Scenario summary */}
-      <p className="text-sm text-[var(--ps-muted)] leading-relaxed text-center px-4 ps-reveal" style={{ animationDelay: '400ms' }}>
-        With a {budgetDisplay} budget, AdCanvas delivers{' '}
-        <span className="text-white font-semibold">{formatCompact(padsquadImpressions)}</span>{' '}
-        impressions vs.{' '}
-        <span className="text-white font-semibold">{formatCompact(traditionalImpressions)}</span>{' '}
-        with a traditional vendor —{' '}
-        <span className="text-[var(--ps-teal)] font-semibold">{formatMultiplier(reachMultiplier)}</span>{' '}
-        the reach for the same investment.
-      </p>
+      {/* Prominent scenario summary */}
+      <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
+        <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
+          With a {budgetDisplay} budget, AdCanvas delivers{' '}
+          <span className="text-white font-bold">{formatCompact(padsquadImpressions)}</span>{' '}
+          impressions vs.{' '}
+          <span className="text-white font-bold">{formatCompact(traditionalImpressions)}</span>{' '}
+          with a traditional vendor —{' '}
+          <span className="text-[var(--ps-teal)] font-bold text-xl">{formatMultiplier(reachMultiplier)}</span>{' '}
+          the reach for the same investment.
+        </p>
+      </div>
     </div>
   )
 }

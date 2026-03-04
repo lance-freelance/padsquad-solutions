@@ -5,13 +5,16 @@
  *   Traditional:  Impressions = Budget / VendorCPM × 1000
  *   PadSquad:     Impressions = Budget / (CaaS + ProgECPM) × 1000
  *   Value:        Incremental / 1000 × PadSquadAllInCPM
+ *
+ * eCPM is clamped to never exceed vendor CPM.
  */
 
 export function calculateEfficiency({ budget, vendorCpm, caasCpm, programmaticEcpm }) {
   const b = Number(budget) || 0
   const vendor = Number(vendorCpm) || 0
   const caas = Number(caasCpm) || 0
-  const progEcpm = Number(programmaticEcpm) || 0
+  // eCPM can never exceed vendor rate — you wouldn't buy more expensive media
+  const progEcpm = Math.min(Number(programmaticEcpm) || 0, vendor)
 
   if (b <= 0 || vendor <= 0) return null
 
