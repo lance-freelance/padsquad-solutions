@@ -104,8 +104,8 @@ html, body {
   }
 
   .ps-toggle {
-    width: 240px;
-    height: 44px;
+    width: 180px;
+    height: 40px;
     border-radius: 9999px;
     border: 1px solid var(--ps-divider);
     background: rgba(255, 255, 255, 0.06);

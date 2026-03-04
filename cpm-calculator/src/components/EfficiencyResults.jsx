@@ -32,7 +32,7 @@ function ComparisonBar({ label, value, maxValue, variant, delay = 0 }) {
 
   return (
     <div className="flex items-center gap-3 ps-reveal" style={{ animationDelay: `${delay}ms` }}>
-      <div className={`w-28 text-[10px] font-bold tracking-[0.1em] uppercase text-right shrink-0 ${
+      <div className={`w-20 sm:w-28 text-[10px] font-bold tracking-[0.1em] uppercase text-right shrink-0 ${
         variant === 'padsquad' ? 'text-[var(--ps-pink)]' : 'text-[var(--ps-muted)]'
       }`}>
         {label}

@@ -47,6 +47,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[var(--ps-bg)]">
       <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6">
+        <a href="/" className="inline-flex items-center gap-1.5 text-xs text-[var(--ps-muted)] hover:text-[var(--ps-pink)] transition-colors mb-4">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M7 3L3 7l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Solutions Hub
+        </a>
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
@@ -60,7 +64,7 @@ export default function App() {
               <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
             </svg>
             <h1 className="text-2xl sm:text-3xl font-semibold text-white">
-              AdCanvas CPM Calculator
+              AdCanvas<br className="sm:hidden" /> CPM Calculator
             </h1>
           </div>
           <div className="ps-tab-bar">
