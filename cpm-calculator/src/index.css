@@ -179,12 +179,12 @@ html, body {
     height: 22px;
   }
 
-  .ps-range--teal::-webkit-slider-thumb {
-    background: var(--ps-teal);
-    box-shadow: 0 2px 8px rgba(132, 214, 226, 0.3);
+  .ps-range--purple::-webkit-slider-thumb {
+    background: var(--ps-purple);
+    box-shadow: 0 2px 8px rgba(168, 130, 255, 0.3);
   }
-  .ps-range--teal::-moz-range-thumb {
-    background: var(--ps-teal);
+  .ps-range--purple::-moz-range-thumb {
+    background: var(--ps-purple);
   }
 
   /* ---- Tab bar ---- */
@@ -252,7 +252,7 @@ html, body {
     background: rgba(255, 255, 255, 0.12);
   }
   .ps-bar--padsquad {
-    background: linear-gradient(90deg, var(--ps-pink), var(--ps-teal));
+    background: linear-gradient(90deg, var(--ps-pink), var(--ps-purple));
   }
 
   /* ---- Footer bar ---- */

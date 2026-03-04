@@ -34,7 +34,7 @@ export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced, ve
 
   return (
     <div className="ps-card p-6 ps-reveal" style={{ animationDelay: '500ms' }}>
-      <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-teal)] uppercase mb-6">
+      <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-purple)] uppercase mb-6">
         Fine-Tune Your Media Investment
       </div>
 
@@ -48,7 +48,7 @@ export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced, ve
         </div>
         <input
           type="range"
-          className="ps-range ps-range--teal"
+          className="ps-range ps-range--purple"
           value={effectiveEcpm}
           min={FIELD_CONFIG.programmaticEcpm.min}
           max={maxEcpm}
@@ -91,7 +91,7 @@ export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced, ve
           <div className="mt-3">
             <input
               type="range"
-              className="ps-range ps-range--teal"
+              className="ps-range ps-range--purple"
               value={values.caasCpm}
               min={FIELD_CONFIG.caasCpm.min}
               max={FIELD_CONFIG.caasCpm.max}
