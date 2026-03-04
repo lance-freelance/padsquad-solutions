@@ -1,6 +1,7 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useCallback } from 'react'
 import { CalculatorForm } from './components/CalculatorForm'
 import { EfficiencyResults } from './components/EfficiencyResults'
+import { EcpmTuner } from './components/EcpmTuner'
 import { InvestmentSummary } from './components/InvestmentSummary'
 import { ResultsExport } from './components/ResultsExport'
 import { calculateEfficiency } from './utils/calculations'
@@ -17,17 +18,26 @@ export default function App() {
     display: { ...TAB_DEFAULTS.display },
     video: { ...TAB_DEFAULTS.video },
   })
+  const [revealed, setRevealed] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const resultsRef = useRef(null)
+  const revealRef = useRef(null)
 
   const values = formValues[activeTab]
 
-  const handleChange = (field, value) => {
+  const handleChange = useCallback((field, value) => {
     setFormValues((prev) => ({
       ...prev,
       [activeTab]: { ...prev[activeTab], [field]: value },
     }))
-  }
+  }, [activeTab])
+
+  const handleReveal = useCallback(() => {
+    setRevealed(true)
+    setTimeout(() => {
+      revealRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }, [])
 
   const results = useMemo(() => {
     return calculateEfficiency(values)
@@ -35,7 +45,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[var(--ps-bg)]">
-      <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6">
+      <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6">
         {/* Header */}
         <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
@@ -49,7 +59,7 @@ export default function App() {
               <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
             </svg>
             <h1 className="text-2xl sm:text-3xl font-semibold text-white">
-              AdCanvas CPM Efficiency Calculator
+              AdCanvas CPM Calculator
             </h1>
           </div>
           <div className="ps-tab-bar">
@@ -69,33 +79,39 @@ export default function App() {
           </div>
         </div>
 
-        {/* Calculator form */}
-        <section className="mb-8">
+        {/* Phase 1 — Inputs */}
+        <section className="mb-6">
           <CalculatorForm
             values={values}
             onChange={handleChange}
-            showAdvanced={showAdvanced}
-            onToggleAdvanced={() => setShowAdvanced((p) => !p)}
+            onReveal={handleReveal}
+            revealed={revealed}
           />
         </section>
 
-        {/* Results (export target) */}
-        <section className="space-y-6">
-          <div ref={resultsRef} className="space-y-6">
-            <EfficiencyResults results={results} budget={values.budget} />
-            <InvestmentSummary results={results} />
-          </div>
+        {/* Phase 2 — Reveal */}
+        {revealed && results && (
+          <section key={activeTab} ref={revealRef} className="space-y-6">
+            <div ref={resultsRef} className="space-y-6">
+              <EfficiencyResults results={results} budget={values.budget} />
+              <EcpmTuner
+                values={values}
+                onChange={handleChange}
+                showAdvanced={showAdvanced}
+                onToggleAdvanced={() => setShowAdvanced((p) => !p)}
+              />
+              <InvestmentSummary results={results} />
+            </div>
 
-          {/* Footer bar */}
-          {results && (
-            <div className="ps-footer-bar">
+            {/* Footer bar */}
+            <div className="ps-footer-bar ps-reveal" style={{ animationDelay: '700ms' }}>
               <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase">
                 AdCanvas CPM Calculator
               </div>
               <ResultsExport targetRef={resultsRef} activeTab={activeTab} />
             </div>
-          )}
-        </section>
+          </section>
+        )}
       </main>
     </div>
   )

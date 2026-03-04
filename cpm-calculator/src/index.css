@@ -74,13 +74,26 @@ html, body {
   .ps-btn--primary:hover {
     opacity: 0.92;
   }
-  .ps-btn--secondary {
-    background: transparent;
+
+  /* Reveal CTA — gradient with glow */
+  .ps-btn--reveal {
+    height: 56px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, var(--ps-pink), var(--ps-purple));
     color: white;
-    border: 1px solid var(--ps-pink);
+    border: none;
+    box-shadow: 0 4px 24px rgba(240, 98, 158, 0.3);
+    transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
   }
-  .ps-btn--secondary:hover {
-    background: rgba(240, 98, 158, 0.08);
+  .ps-btn--reveal:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(240, 98, 158, 0.4);
+  }
+  .ps-btn--reveal:active {
+    transform: translateY(0);
   }
 
   /* ---- Inputs ---- */
@@ -150,6 +163,22 @@ html, body {
     border: 2px solid var(--ps-card);
     cursor: pointer;
   }
+
+  /* Large slider variant for Phase 1 */
+  .ps-range--lg {
+    height: 6px;
+    border-radius: 3px;
+  }
+  .ps-range--lg::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    box-shadow: 0 2px 12px rgba(240, 98, 158, 0.35);
+  }
+  .ps-range--lg::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
   .ps-range--teal::-webkit-slider-thumb {
     background: var(--ps-teal);
     box-shadow: 0 2px 8px rgba(132, 214, 226, 0.3);
@@ -188,30 +217,6 @@ html, body {
     color: white;
   }
 
-  /* ---- Stats ---- */
-  .ps-stat {
-    text-align: center;
-  }
-  .ps-stat__value {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-bold);
-    color: white;
-    line-height: 1.2;
-  }
-  .ps-stat__value--pink {
-    color: var(--ps-pink);
-  }
-  .ps-stat__value--teal {
-    color: var(--ps-teal);
-  }
-  .ps-stat__label {
-    font-size: var(--text-xs);
-    color: var(--ps-muted);
-    margin-top: var(--space-1);
-    letter-spacing: var(--letter-spacing-wide);
-    text-transform: uppercase;
-  }
-
   /* ---- Hero stats (large version) ---- */
   .ps-hero-value {
     font-size: clamp(1.75rem, 3vw, 2.5rem);
@@ -230,15 +235,15 @@ html, body {
 
   /* ---- Comparison bars ---- */
   .ps-bar {
-    height: 28px;
-    border-radius: 6px;
-    transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    height: 32px;
+    border-radius: 8px;
+    transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1);
     min-width: 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 10px;
-    font-size: 11px;
+    padding: 0 12px;
+    font-size: 12px;
     font-weight: 700;
     color: white;
     letter-spacing: 0.04em;
@@ -275,32 +280,18 @@ html, body {
   .ps-col-header--pink {
     color: var(--ps-pink);
   }
-
-  /* ---- All-in CPM computed row ---- */
-  .ps-allin {
-    padding: 12px 0;
-    border-top: 1px solid var(--ps-divider);
-    margin-top: 16px;
-  }
-  .ps-allin__label {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--ps-muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 2px;
-  }
-  .ps-allin__value {
-    font-size: 22px;
-    font-weight: 700;
-    color: white;
-  }
-  .ps-allin__value--pink {
-    color: var(--ps-pink);
-  }
 }
 
-/* ---- Animation ---- */
+/* ---- Reveal animation ---- */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ps-reveal {
+  animation: revealUp 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---- Fade-slide (legacy, kept for reuse) ---- */
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
