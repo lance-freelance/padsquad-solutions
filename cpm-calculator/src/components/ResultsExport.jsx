@@ -12,8 +12,13 @@ export function ResultsExport({ targetRef, activeTab }) {
     if (!targetRef.current) return
     setExporting(true)
     try {
-      // Toggle export mode — shows branded header/footer, hides tuner
+      // Toggle export mode — shows branded header/footer, hides tuner,
+      // and forces all animated elements to opacity:1 via CSS
       targetRef.current.classList.add('ps-exporting')
+
+      // Wait for DOM/style updates to settle before capturing
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))
+
       const canvas = await html2canvas(targetRef.current, {
         backgroundColor: '#14133A',
         scale: 2,

@@ -295,6 +295,13 @@ html, body {
 .ps-exporting {
   padding: 32px;
 }
+/* Force all animated elements visible during export (html2canvas can't read animation state) */
+.ps-exporting .ps-reveal,
+.ps-exporting .ps-animate-in {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
 
 /* ---- Reveal animation ---- */
 @keyframes revealUp {
