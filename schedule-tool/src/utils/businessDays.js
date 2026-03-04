@@ -84,9 +84,10 @@ export function subBD(date, n) {
  */
 export function getMilestoneDatesFromKickOff(kickOffDate, milestones) {
   const kickOff = new Date(kickOffDate)
-  return milestones.map(({ label, bdOffset }) => ({
+  return milestones.map(({ label, bdOffset, isClientAction }) => ({
     label,
     bdOffset,
+    isClientAction,
     date: addBD(kickOff, bdOffset),
   }))
 }

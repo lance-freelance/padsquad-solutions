@@ -33,7 +33,6 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
           'flex items-center gap-4 px-4 py-3',
           localIndex % 2 === 0 ? 'bg-[rgba(255,255,255,0.02)]' : 'bg-transparent',
           isFirst ? '' : 'border-t border-[var(--ps-divider)]',
-          m.isClientAction ? 'border-l-2 border-l-[var(--ps-pink)]' : '',
         ].join(' ')}
       >
         <div className="flex-shrink-0">
@@ -41,17 +40,11 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
             {format(m.date, 'd MMM').toUpperCase()}
           </div>
         </div>
-        <div className="flex-1 min-w-0 flex items-center gap-2">
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-2 pr-2">
           <div className="text-white font-medium">{m.label}</div>
           {m.isClientAction && (
-            <span
-              className="flex-shrink-0 text-[9px] font-bold tracking-[0.14em] uppercase px-1.5 py-0.5 rounded"
-              style={{
-                color: 'var(--ps-pink)',
-                background: 'rgba(255,90,140,0.12)',
-                border: '1px solid rgba(255,90,140,0.25)',
-              }}
-            >
+            <span className="ps-clientTag flex-shrink-0">
+              <span className="ps-clientTag__dot" />
               Client
             </span>
           )}
@@ -73,8 +66,8 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
         </div>
         <div className="flex items-center gap-1.5">
           <span
-            className="inline-block w-2 h-2 rounded-sm"
-            style={{ background: 'rgba(255,90,140,0.5)' }}
+            className="inline-block w-2 h-2 rounded-full"
+            style={{ background: 'var(--ps-purple)' }}
           />
           <span className="text-[10px] tracking-[0.1em] text-[var(--ps-muted)] uppercase">
             Client action required

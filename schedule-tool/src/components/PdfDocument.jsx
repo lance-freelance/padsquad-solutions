@@ -11,6 +11,7 @@ const navy   = '#14133A'
 const card   = '#1E1D42'
 const pink   = '#F0629E'
 const teal   = '#84D6E2'
+const purple = '#9B59B6'
 const divider = '#2D2B5A'
 const white  = '#FFFFFF'
 const muted  = '#898A9E'
@@ -103,7 +104,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   badgeTeal: {
+    backgroundColor: teal,
     borderColor: teal,
+  },
+  badgeTealText: {
+    color: navy,
   },
   badgeText: {
     fontSize: 8,
@@ -114,10 +119,68 @@ const styles = StyleSheet.create({
   },
 
   /* ── Milestone label ── */
+  labelRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   label: {
     fontSize: 9,
     color: white,
-    flex: 1,
+  },
+
+  /* ── Client action tag ── */
+  clientTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 89, 182, 0.35)',
+    backgroundColor: 'rgba(155, 89, 182, 0.12)',
+    borderRadius: 999,
+    paddingTop: 2,
+    paddingBottom: 2,
+    paddingLeft: 6,
+    paddingRight: 6,
+  },
+  clientDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: purple,
+  },
+  clientText: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    color: purple,
+    letterSpacing: 1.5,
+  },
+
+  /* ── Legend ── */
+  cardHeaderRow: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  legend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  legendDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: purple,
+  },
+  legendText: {
+    fontSize: 6,
+    color: muted,
+    letterSpacing: 1.5,
   },
 
   /* ── Footer ── */
@@ -143,8 +206,9 @@ export function PdfDocument({ milestones = [], anchorDate, dateType, designMode 
   const designStr  = designMode === 'client' ? 'Client design' : 'PadSquad design'
   const lastIndex  = milestones.length - 1
 
-  const left  = milestones.slice(0, 8)
-  const right = milestones.slice(8)
+  const splitAt = Math.ceil(milestones.length / 2)
+  const left  = milestones.slice(0, splitAt)
+  const right = milestones.slice(splitAt)
 
   const renderRow = (m, globalIndex, localIndex) => {
     const isLaunch = globalIndex === lastIndex
@@ -155,11 +219,19 @@ export function PdfDocument({ milestones = [], anchorDate, dateType, designMode 
         style={[styles.row, isFirst && styles.rowFirst]}
       >
         <View style={[styles.badge, isLaunch && styles.badgeTeal]}>
-          <Text style={styles.badgeText}>
+          <Text style={[styles.badgeText, isLaunch && styles.badgeTealText]}>
             {format(m.date, 'd MMM').toUpperCase()}
           </Text>
         </View>
-        <Text style={styles.label}>{m.label}</Text>
+        <View style={styles.labelRow}>
+          <Text style={styles.label}>{m.label}</Text>
+          {m.isClientAction && (
+            <View style={styles.clientTag}>
+              <View style={styles.clientDot} />
+              <Text style={styles.clientText}>CLIENT</Text>
+            </View>
+          )}
+        </View>
       </View>
     )
   }
@@ -179,15 +251,19 @@ export function PdfDocument({ milestones = [], anchorDate, dateType, designMode 
 
         {/* Timeline card */}
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
+          <View style={styles.cardHeaderRow}>
             <Text style={styles.sectionLabel}>CAMPAIGN TIMELINE</Text>
+            <View style={styles.legend}>
+              <View style={styles.legendDot} />
+              <Text style={styles.legendText}>CLIENT ACTION REQUIRED</Text>
+            </View>
           </View>
           <View style={styles.columns}>
             <View style={styles.colLeft}>
               {left.map((m, i) => renderRow(m, i, i))}
             </View>
             <View style={styles.colRight}>
-              {right.map((m, i) => renderRow(m, i + 8, i))}
+              {right.map((m, i) => renderRow(m, i + splitAt, i))}
             </View>
           </View>
         </View>
