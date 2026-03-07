@@ -159,8 +159,8 @@ export default function App() {
             {/* CTA */}
             <div className="text-center ps-reveal" style={{ animationDelay: '800ms' }}>
               <p className="text-sm text-[var(--ps-muted)] mb-3">
-                <span className="text-white font-semibold">Ready to decouple?</span>{' '}
-                Talk to our team about modeling this for your specific media plan.
+                <span className="text-white font-semibold">Ready to get more from your media?</span>{' '}
+                Talk to our team about modeling this efficiency for your specific media plan.
               </p>
               <a
                 href="https://padsquad.com/contact-us?utm_source=cpm-calculator&utm_medium=tool&utm_campaign=adcanvas-cpm&utm_content=decouple-cta"

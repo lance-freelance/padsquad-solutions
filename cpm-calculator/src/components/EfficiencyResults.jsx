@@ -1,4 +1,4 @@
-import { formatNumber, formatCurrency, formatMultiplier, formatCompact, formatCpm } from '../utils/calculations'
+import { formatCurrency, formatMultiplier, formatCompact, formatCpm } from '../utils/calculations'
 import { useCountUp } from '../hooks/useCountUp'
 
 function HeroStat({ value, label, tag, accent, prefix = '', delay = 0 }) {
@@ -13,7 +13,7 @@ function HeroStat({ value, label, tag, accent, prefix = '', delay = 0 }) {
   } else if (prefix === '$') {
     displayVal = formatCurrency(animated)
   } else {
-    displayVal = (prefix || '') + formatNumber(animated)
+    displayVal = (prefix || '') + formatCompact(animated)
   }
 
   return (
@@ -101,7 +101,7 @@ export function EfficiencyResults({ results, budget }) {
       {/* CPM savings callout */}
       <div className="text-center ps-reveal" style={{ animationDelay: '280ms' }}>
         <span className="inline-flex items-center gap-2 text-xs text-[var(--ps-muted)] bg-[rgba(255,255,255,0.04)] rounded-full px-4 py-2">
-          Legacy CPM {formatCpm(vendorCpm)} → Decoupled Creative CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
+          Legacy CPM {formatCpm(vendorCpm)} → Decoupled Media & Creative CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
         </span>
       </div>
 
@@ -110,17 +110,17 @@ export function EfficiencyResults({ results, budget }) {
         <div className="ps-col-header ps-col-header--gray mb-4">Impression Comparison</div>
         <div className="space-y-3">
           <ComparisonBar label="Legacy Media Model" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={350} />
-          <ComparisonBar label="Decoupled Creative (AdCanvas)" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
+          <ComparisonBar label="AdCanvas CaaS" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
         </div>
       </div>
 
       {/* Prominent scenario summary — savings → working media narrative */}
       <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
         <div className="text-[10px] font-bold tracking-[0.18em] text-[var(--ps-pink)] uppercase mb-3">
-          The Decoupling Dividend
+          What AdCanvas Unlocks
         </div>
         <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
-          With a {budgetDisplay} budget, separating creative delivery from your media buy reduces your effective CPM from{' '}
+          With a {budgetDisplay} budget, AdCanvas Creative as a Service reduces your effective CPM from{' '}
           <span className="text-white font-bold">{formatCpm(vendorCpm)}</span> to{' '}
           <span className="text-[var(--ps-pink)] font-bold">{formatCpm(padsquadAllInCpm)}</span>{' '}
           — freeing{' '}
