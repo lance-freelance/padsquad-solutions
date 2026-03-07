@@ -1,53 +1,62 @@
 import { addDays, subDays, isWeekend, format } from 'date-fns'
 
 /**
- * US federal holidays — add more as needed.
- * Format: 'YYYY-MM-DD'
- * Includes: New Year's, MLK, Presidents', Memorial, Juneteenth,
- * Independence, Labor, Columbus, Veterans, Thanksgiving, Christmas.
+ * US federal holidays with names.
+ * Format: { date: 'YYYY-MM-DD', name: string }
  */
-const HOLIDAYS = [
+const HOLIDAY_ENTRIES = [
   // ── 2025 ──
-  '2025-01-01', // New Year's Day
-  '2025-01-20', // MLK Day
-  '2025-02-17', // Presidents' Day
-  '2025-05-26', // Memorial Day
-  '2025-06-19', // Juneteenth
-  '2025-07-04', // Independence Day
-  '2025-09-01', // Labor Day
-  '2025-10-13', // Columbus Day
-  '2025-11-11', // Veterans Day
-  '2025-11-27', // Thanksgiving
-  '2025-12-25', // Christmas
+  { date: '2025-01-01', name: "New Year's Day" },
+  { date: '2025-01-20', name: 'MLK Day' },
+  { date: '2025-02-17', name: "Presidents' Day" },
+  { date: '2025-05-26', name: 'Memorial Day' },
+  { date: '2025-06-19', name: 'Juneteenth' },
+  { date: '2025-07-04', name: 'Independence Day' },
+  { date: '2025-09-01', name: 'Labor Day' },
+  { date: '2025-10-13', name: 'Columbus Day' },
+  { date: '2025-11-11', name: 'Veterans Day' },
+  { date: '2025-11-27', name: 'Thanksgiving' },
+  { date: '2025-12-25', name: 'Christmas' },
 
   // ── 2026 ──
-  '2026-01-01', // New Year's Day
-  '2026-01-19', // MLK Day
-  '2026-02-16', // Presidents' Day
-  '2026-05-25', // Memorial Day
-  '2026-06-19', // Juneteenth
-  '2026-07-03', // Independence Day (observed)
-  '2026-09-07', // Labor Day
-  '2026-10-12', // Columbus Day
-  '2026-11-11', // Veterans Day
-  '2026-11-26', // Thanksgiving
-  '2026-12-25', // Christmas
+  { date: '2026-01-01', name: "New Year's Day" },
+  { date: '2026-01-19', name: 'MLK Day' },
+  { date: '2026-02-16', name: "Presidents' Day" },
+  { date: '2026-05-25', name: 'Memorial Day' },
+  { date: '2026-06-19', name: 'Juneteenth' },
+  { date: '2026-07-03', name: 'Independence Day (observed)' },
+  { date: '2026-09-07', name: 'Labor Day' },
+  { date: '2026-10-12', name: 'Columbus Day' },
+  { date: '2026-11-11', name: 'Veterans Day' },
+  { date: '2026-11-26', name: 'Thanksgiving' },
+  { date: '2026-12-25', name: 'Christmas' },
 
   // ── 2027 ──
-  '2027-01-01', // New Year's Day
-  '2027-01-18', // MLK Day
-  '2027-02-15', // Presidents' Day
-  '2027-05-31', // Memorial Day
-  '2027-06-18', // Juneteenth (observed — Jun 19 is Sat)
-  '2027-07-05', // Independence Day (observed — Jul 4 is Sun)
-  '2027-09-06', // Labor Day
-  '2027-10-11', // Columbus Day
-  '2027-11-11', // Veterans Day
-  '2027-11-25', // Thanksgiving
-  '2027-12-24', // Christmas (observed — Dec 25 is Sat)
+  { date: '2027-01-01', name: "New Year's Day" },
+  { date: '2027-01-18', name: 'MLK Day' },
+  { date: '2027-02-15', name: "Presidents' Day" },
+  { date: '2027-05-31', name: 'Memorial Day' },
+  { date: '2027-06-18', name: 'Juneteenth (observed)' },
+  { date: '2027-07-05', name: 'Independence Day (observed)' },
+  { date: '2027-09-06', name: 'Labor Day' },
+  { date: '2027-10-11', name: 'Columbus Day' },
+  { date: '2027-11-11', name: 'Veterans Day' },
+  { date: '2027-11-25', name: 'Thanksgiving' },
+  { date: '2027-12-24', name: 'Christmas (observed)' },
 ]
 
-const holidaySet = new Set(HOLIDAYS)
+/** Map of 'YYYY-MM-DD' → holiday name, for quick lookups */
+export const HOLIDAY_NAME_MAP = Object.fromEntries(
+  HOLIDAY_ENTRIES.map(({ date, name }) => [date, name]),
+)
+
+/** Array of Date objects for all known holidays (used by the calendar) */
+export const HOLIDAY_DATES = HOLIDAY_ENTRIES.map(({ date }) => {
+  const [y, m, d] = date.split('-').map(Number)
+  return new Date(y, m - 1, d)
+})
+
+const holidaySet = new Set(HOLIDAY_ENTRIES.map((e) => e.date))
 
 /**
  * @param {Date} date
@@ -118,6 +127,27 @@ export function businessDaysBetween(start, end) {
     if (isBusinessDay(d)) count++
   }
   return count
+}
+
+/**
+ * Return holidays that fall within [startDate, endDate] inclusive.
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {{ date: Date, name: string }[]}
+ */
+export function getHolidaysInRange(startDate, endDate) {
+  const s = new Date(startDate); s.setHours(0, 0, 0, 0)
+  const e = new Date(endDate);   e.setHours(0, 0, 0, 0)
+  return HOLIDAY_ENTRIES
+    .filter(({ date }) => {
+      const [y, m, d] = date.split('-').map(Number)
+      const t = new Date(y, m - 1, d)
+      return t >= s && t <= e
+    })
+    .map(({ date, name }) => {
+      const [y, m, d] = date.split('-').map(Number)
+      return { date: new Date(y, m - 1, d), name }
+    })
 }
 
 /**

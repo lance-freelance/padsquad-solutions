@@ -6,7 +6,7 @@ import { format } from 'date-fns'
  * Receives computed milestone entries { label, date, bdOffset, isClientAction }.
  * Steps with isClientAction: true are highlighted as client-owned gates.
  */
-export const Timeline = forwardRef(function Timeline({ milestones, id: timelineId, timelineWarning }, ref) {
+export const Timeline = forwardRef(function Timeline({ milestones, id: timelineId, timelineWarning, holidays = [] }, ref) {
   if (!milestones || milestones.length === 0) {
     return (
       <div
@@ -19,19 +19,64 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
     )
   }
 
-  const lastIndex = milestones.length - 1
-  const splitAt = Math.ceil(milestones.length / 2)
-  const left = milestones.slice(0, splitAt)
-  const right = milestones.slice(splitAt)
+  // Merge milestones and holidays into one sorted list
+  const holidayItems = holidays.map((h) => ({
+    label: h.name,
+    date: h.date,
+    isHoliday: true,
+    bdOffset: -1,
+  }))
+  const combined = [...milestones, ...holidayItems].sort(
+    (a, b) => new Date(a.date) - new Date(b.date),
+  )
+
+  // The last *milestone* (not holiday) is campaign launch
+  const launchDate = milestones[milestones.length - 1]?.date
+
+  const splitAt = Math.ceil(combined.length / 2)
+  const left = combined.slice(0, splitAt)
+  const right = combined.slice(splitAt)
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const renderItem = (m, globalIndex, localIndex, isFirst) => {
-    const isLaunch = globalIndex === lastIndex
+  const renderItem = (m, localIndex, isFirst) => {
+    if (m.isHoliday) {
+      const mDate = new Date(m.date)
+      mDate.setHours(0, 0, 0, 0)
+      const isPast = timelineWarning === 'past' && mDate < today
+      return (
+        <li
+          key={`holiday-${m.label}-${format(m.date, 'yyyy-MM-dd')}`}
+          className={[
+            'flex items-center gap-4 px-4 py-2.5',
+            'bg-[rgba(245,158,11,0.04)]',
+            isFirst ? '' : 'border-t border-[var(--ps-divider)]',
+            isPast ? 'opacity-40' : '',
+          ].join(' ')}
+        >
+          <div className="flex-shrink-0">
+            <div className="ps-dateBadge ps-dateBadge--holiday">
+              {format(m.date, 'd MMM').toUpperCase()}
+            </div>
+          </div>
+          <div className="flex-1 min-w-0 flex items-center justify-between gap-2 pr-2">
+            <div className="text-[#F59E0B] font-medium text-sm">{m.label}</div>
+            <span className="ps-holidayTag flex-shrink-0">
+              <span className="ps-holidayTag__dot" />
+              Offices Closed
+            </span>
+          </div>
+        </li>
+      )
+    }
+
+    const isLaunch = m.date && launchDate &&
+      format(new Date(m.date), 'yyyy-MM-dd') === format(new Date(launchDate), 'yyyy-MM-dd')
     const mDate = new Date(m.date)
     mDate.setHours(0, 0, 0, 0)
     const isPast = timelineWarning === 'past' && mDate < today
+
     return (
       <li
         key={`${m.label}-${m.bdOffset}`}
@@ -67,27 +112,37 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
       className="ps-card overflow-hidden"
       style={{ minWidth: 320 }}
     >
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-between gap-4 flex-wrap">
         <div className="text-xs tracking-[0.18em] font-semibold text-[var(--ps-pink)] uppercase">
           CAMPAIGN TIMELINE
         </div>
-        <div className="flex items-center gap-1.5">
-          <span
-            className="inline-block w-2 h-2 rounded-full"
-            style={{ background: 'var(--ps-purple)' }}
-          />
-          <span className="text-[10px] tracking-[0.1em] text-[var(--ps-muted)] uppercase">
-            Client action required
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ background: 'var(--ps-purple)' }}
+            />
+            <span className="text-[10px] tracking-[0.1em] text-[var(--ps-muted)] uppercase">
+              Client action
+            </span>
+          </div>
+          {holidays.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 rounded-full bg-[#F59E0B] opacity-80" />
+              <span className="text-[10px] tracking-[0.1em] text-[var(--ps-muted)] uppercase">
+                Holiday
+              </span>
+            </div>
+          )}
         </div>
       </div>
       <div className="px-2 pb-2">
         <div className="grid grid-cols-1 md:grid-cols-2">
           <ul className="space-y-0">
-            {left.map((m, i) => renderItem(m, i, i, i === 0))}
+            {left.map((m, i) => renderItem(m, i, i === 0))}
           </ul>
           <ul className="space-y-0 md:border-l md:border-[var(--ps-divider)]">
-            {right.map((m, i) => renderItem(m, i + splitAt, i, i === 0))}
+            {right.map((m, i) => renderItem(m, i, i === 0))}
           </ul>
         </div>
       </div>

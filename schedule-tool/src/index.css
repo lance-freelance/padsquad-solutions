@@ -172,6 +172,42 @@ html, body {
     outline-offset: 2px;
   }
 
+  .ps-dateBadge--holiday {
+    border: 1px solid rgba(245, 158, 11, 0.5);
+    color: #F59E0B;
+    border-radius: 9999px;
+    padding: 10px 12px;
+    min-width: 86px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+  }
+
+  .ps-holidayTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .ps-holidayTag__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #F59E0B;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+
   .ps-clientTag {
     display: inline-flex;
     align-items: center;
@@ -315,4 +351,24 @@ html, body {
   text-decoration-color: var(--ps-teal);
   text-decoration-thickness: 2px;
   text-underline-offset: 6px;
+}
+/* Federal holiday: amber color + dot beneath the date number */
+.ps-holiday .ps-rdp__dayButton {
+  color: #F59E0B;
+  opacity: 1;
+  cursor: not-allowed;
+  position: relative;
+}
+.ps-holiday .ps-rdp__dayButton::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #F59E0B;
+  opacity: 0.85;
 }

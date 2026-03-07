@@ -11,12 +11,12 @@ import {
   getClientAssetsMilestones,
   DEFAULT_CREATIVE_DAYS,
   DEFAULT_DEMO_DAYS,
-  AD_COMMERCE_DEMO_DAYS,
 } from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
   businessDaysBetween,
+  getHolidaysInRange,
 } from './utils/businessDays'
 
 const TIMELINE_EXPORT_ID = 'campaign-timeline-export'
@@ -58,15 +58,10 @@ function App() {
   const [activeTarget, setActiveTarget] = useState('kick-off')
   const [creativeDays, setCreativeDays] = useState(DEFAULT_CREATIVE_DAYS)
   const [demoDays, setDemoDays] = useState(DEFAULT_DEMO_DAYS)
-  const [adCommerce, setAdCommerce] = useState(false)
   const [smartCommerce, setSmartCommerce] = useState(false)
   const [showBuildSettings, setShowBuildSettings] = useState(false)
   const timelineRef = useRef(null)
 
-  const handleAdCommerceToggle = (checked) => {
-    setAdCommerce(checked)
-    setDemoDays(checked ? AD_COMMERCE_DEMO_DAYS : DEFAULT_DEMO_DAYS)
-  }
 
   // 2×2 matrix: design ownership × asset readiness
   const milestonesConfig = useMemo(() => {
@@ -105,6 +100,12 @@ function App() {
     if (bdAway <= 3) return 'caution'
     return null
   }, [kickOffDate])
+
+  // Holidays that fall within the campaign window (to inject into the timeline)
+  const holidays = useMemo(() => {
+    if (!kickOffDate || !goLiveDate) return []
+    return getHolidaysInRange(kickOffDate, goLiveDate)
+  }, [kickOffDate, goLiveDate])
 
   const onSelectCalendarDate = (d) => {
     if (!d) return
@@ -210,8 +211,8 @@ function App() {
           </div>
         </section>
 
-        {/* ASSETS CONFIRMATION + BUILD TIMELINE CONTROLS */}
-        <div className="mb-8 space-y-5">
+        {/* ASSETS CONFIRMATION */}
+        <div className="mb-8">
           {/* Checkboxes row */}
           <div className="flex flex-wrap gap-x-8 gap-y-3">
           {/* Assets checkbox */}
@@ -265,79 +266,6 @@ function App() {
             </span>
           </label>
           </div>{/* end checkboxes row */}
-
-          {/* Build timeline day controls — collapsed by default */}
-          <div className="ps-card overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setShowBuildSettings((v) => !v)}
-              className="w-full flex items-center justify-between px-5 py-4 text-left group"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase">
-                  Build Timeline
-                </span>
-                {!showBuildSettings && (
-                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60 tabular-nums">
-                    {designMode === 'padSquad' && !assetsReady ? `Creative ${creativeDays}d · ` : ''}Demo {demoDays}d{adCommerce ? ' · Ad Commerce' : ''}
-                  </span>
-                )}
-              </div>
-              <span className="text-[var(--ps-muted)] group-hover:text-[var(--ps-textSoft)] transition-colors text-xs font-semibold">
-                {showBuildSettings ? 'Done' : 'Adjust'}
-              </span>
-            </button>
-            {showBuildSettings && (
-              <div className="px-5 pb-5 border-t border-[var(--ps-divider)]">
-                <div className="flex flex-wrap gap-x-8 gap-y-4 items-end pt-4">
-                  {/* Creative dev days — only applies when PadSquad designs and no assets yet */}
-                  {designMode === 'padSquad' && !assetsReady && (
-                    <DaysStepper
-                      label="Creative Development"
-                      value={creativeDays}
-                      onChange={setCreativeDays}
-                    />
-                  )}
-                  {/* Demo dev days — always relevant */}
-                  <DaysStepper
-                    label="Demo Development"
-                    value={demoDays}
-                    onChange={(v) => {
-                      setDemoDays(v)
-                      if (adCommerce && v !== AD_COMMERCE_DEMO_DAYS) setAdCommerce(false)
-                    }}
-                  />
-                  {/* Ad Commerce toggle */}
-                  <label className="inline-flex items-center gap-2.5 cursor-pointer select-none group self-end pb-0.5">
-                    <span className="relative flex-shrink-0">
-                      <input
-                        type="checkbox"
-                        checked={adCommerce}
-                        onChange={(e) => handleAdCommerceToggle(e.target.checked)}
-                        className="ps-checkbox"
-                      />
-                      <svg
-                        className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${adCommerce ? 'opacity-100' : 'opacity-0'}`}
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        aria-hidden
-                      >
-                        <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </span>
-                    <span className="flex flex-col gap-0.5">
-                      <span className="text-[11px] tracking-[0.1em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
-                        Ad Commerce / Game Build
-                      </span>
-                      <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
-                        Presets demo dev to {AD_COMMERCE_DEMO_DAYS} days
-                      </span>
-                    </span>
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* TIMELINE WARNING */}
@@ -356,7 +284,7 @@ function App() {
 
         {/* TIMELINE */}
         <section className="grid grid-cols-1 gap-6">
-          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} timelineWarning={timelineWarning} />
+          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} timelineWarning={timelineWarning} holidays={holidays} />
           <div
             className="flex items-center justify-between px-5 py-4 rounded-xl"
             style={{
@@ -375,6 +303,47 @@ function App() {
               designMode={designMode}
               smartCommerce={smartCommerce}
             />
+          </div>
+
+          {/* Build timeline day controls — below timeline, collapsed by default */}
+          <div className="ps-card overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowBuildSettings((v) => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase">
+                  Build Timeline Settings
+                </span>
+                {!showBuildSettings && (
+                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60 tabular-nums">
+                    {designMode === 'padSquad' && !assetsReady ? `Creative ${creativeDays}d · ` : ''}Demo {demoDays}d
+                  </span>
+                )}
+              </div>
+              <span className="text-[var(--ps-muted)] group-hover:text-[var(--ps-textSoft)] transition-colors text-xs font-semibold">
+                {showBuildSettings ? 'Done' : 'Adjust'}
+              </span>
+            </button>
+            {showBuildSettings && (
+              <div className="px-5 pb-5 border-t border-[var(--ps-divider)]">
+                <div className="flex flex-wrap gap-x-8 gap-y-4 items-end pt-4">
+                  {designMode === 'padSquad' && !assetsReady && (
+                    <DaysStepper
+                      label="Creative Development"
+                      value={creativeDays}
+                      onChange={setCreativeDays}
+                    />
+                  )}
+                  <DaysStepper
+                    label="Demo Development"
+                    value={demoDays}
+                    onChange={setDemoDays}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>

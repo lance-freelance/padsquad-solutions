@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { isAfter, isBefore, startOfMonth } from 'date-fns'
+import { HOLIDAY_DATES } from '../utils/businessDays'
 import 'react-day-picker/src/style.css'
 
 const MOBILE_QUERY = '(max-width: 639px)'
@@ -46,13 +47,17 @@ export function DatePicker({
 
   return (
     <div className="ps-card ps-card--calendar">
+      <div className="flex items-center gap-2 pb-2 px-2">
+        <span className="inline-block w-2 h-2 rounded-full bg-[#F59E0B] opacity-80" />
+        <span className="text-[10px] text-[#F59E0B] opacity-70 tracking-[0.08em]">Federal holiday — office closed</span>
+      </div>
       <DayPicker
         mode="single"
         defaultMonth={baseMonth}
         numberOfMonths={isMobile ? 1 : 2}
         pagedNavigation
         showOutsideDays
-        disabled={[{ dayOfWeek: [0, 6] }, { before: today }]}
+        disabled={[{ dayOfWeek: [0, 6] }, { before: today }, ...HOLIDAY_DATES]}
         formatters={{
           formatWeekdayName: (weekdayDate) => {
             // Exactly 2 characters, never truncated.
@@ -70,6 +75,7 @@ export function DatePicker({
           goLive: goLiveDate ? [goLiveDate] : [],
           inRange: start && end ? { after: start, before: end } : undefined,
           today: new Date(),
+          holiday: HOLIDAY_DATES,
         }}
         modifiersClassNames={{
           kickOff: activeTarget === 'kick-off' ? 'ps-kickoff ps-active-end' : 'ps-kickoff',
@@ -77,6 +83,7 @@ export function DatePicker({
           inRange: 'ps-range',
           disabled: 'ps-disabled',
           today: 'ps-today',
+          holiday: 'ps-holiday',
         }}
         classNames={{
           root: 'ps-rdp',
