@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { isAfter, isBefore, startOfMonth } from 'date-fns'
+import { HOLIDAY_DATES } from '../utils/businessDays'
 import 'react-day-picker/src/style.css'
 
 const MOBILE_QUERY = '(max-width: 639px)'
@@ -29,7 +30,9 @@ export function DatePicker({
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const baseMonth = startOfMonth(new Date())
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const baseMonth = startOfMonth(today)
   const hasBoth = !!kickOffDate && !!goLiveDate
   const start = hasBoth
     ? isBefore(kickOffDate, goLiveDate)
@@ -50,7 +53,7 @@ export function DatePicker({
         numberOfMonths={isMobile ? 1 : 2}
         pagedNavigation
         showOutsideDays
-        disabled={[{ dayOfWeek: [0, 6] }]}
+        disabled={[{ dayOfWeek: [0, 6] }, { before: today }, ...HOLIDAY_DATES]}
         formatters={{
           formatWeekdayName: (weekdayDate) => {
             // Exactly 2 characters, never truncated.
@@ -68,6 +71,7 @@ export function DatePicker({
           goLive: goLiveDate ? [goLiveDate] : [],
           inRange: start && end ? { after: start, before: end } : undefined,
           today: new Date(),
+          holiday: HOLIDAY_DATES,
         }}
         modifiersClassNames={{
           kickOff: activeTarget === 'kick-off' ? 'ps-kickoff ps-active-end' : 'ps-kickoff',
@@ -75,6 +79,7 @@ export function DatePicker({
           inRange: 'ps-range',
           disabled: 'ps-disabled',
           today: 'ps-today',
+          holiday: 'ps-holiday',
         }}
         classNames={{
           root: 'ps-rdp',
@@ -94,6 +99,14 @@ export function DatePicker({
           outside: 'ps-rdp__outside',
         }}
       />
+      <div className="flex justify-end px-4 pb-3 pt-1">
+        <div className="flex items-center gap-1.5">
+          <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#F59E0B', opacity: 0.7 }} />
+          <span className="text-[10px] tracking-[0.08em] text-[var(--ps-muted)] opacity-70">
+            Federal holiday — office closed
+          </span>
+        </div>
+      </div>
     </div>
   )
 }

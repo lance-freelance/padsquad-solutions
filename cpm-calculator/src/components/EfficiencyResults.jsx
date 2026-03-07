@@ -17,9 +17,9 @@ function HeroStat({ value, label, tag, accent, prefix = '', delay = 0 }) {
   }
 
   return (
-    <div className={`ps-card p-5 text-center ps-reveal`} style={{ animationDelay: `${delay}ms` }}>
+    <div className={`ps-card p-6 text-center ps-reveal`} style={{ animationDelay: `${delay}ms` }}>
       {tag && (
-        <div className="text-[9px] font-bold tracking-[0.1em] text-[var(--ps-muted)] uppercase mb-1">{tag}</div>
+        <div className="text-[10px] font-bold tracking-[0.1em] text-[var(--ps-muted)] uppercase mb-1">{tag}</div>
       )}
       <div className={`ps-hero-value ${colorClass}`}>{displayVal}</div>
       <div className="ps-hero-label">{label}</div>
@@ -32,7 +32,7 @@ function ComparisonBar({ label, value, maxValue, variant, delay = 0 }) {
 
   return (
     <div className="flex items-center gap-3 ps-reveal" style={{ animationDelay: `${delay}ms` }}>
-      <div className={`w-20 sm:w-28 text-[10px] font-bold tracking-[0.1em] uppercase text-right shrink-0 ${
+      <div className={`w-24 sm:w-32 text-[10px] font-bold tracking-[0.1em] uppercase text-right shrink-0 ${
         variant === 'padsquad' ? 'text-[var(--ps-pink)]' : 'text-[var(--ps-muted)]'
       }`}>
         {label}
@@ -67,7 +67,7 @@ export function EfficiencyResults({ results, budget }) {
   const budgetDisplay = formatCurrency(Number(budget) || 0)
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* What you get now — minimized baseline */}
       <div className="text-center py-3 ps-reveal" style={{ animationDelay: '0ms' }}>
         <div className="text-[10px] font-bold tracking-[0.14em] text-[var(--ps-muted)] uppercase mb-1">
@@ -100,15 +100,16 @@ export function EfficiencyResults({ results, budget }) {
 
       {/* CPM savings callout */}
       <div className="text-center ps-reveal" style={{ animationDelay: '280ms' }}>
-        <span className="inline-flex items-center gap-2 text-xs text-[var(--ps-muted)] bg-[rgba(255,255,255,0.04)] rounded-full px-4 py-2">
-          Legacy CPM {formatCpm(vendorCpm)} → Decoupled Media & Creative CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
+        <span className="inline-flex flex-col items-center gap-1 text-xs text-[var(--ps-muted)] bg-[rgba(255,255,255,0.04)] rounded-2xl px-5 py-3">
+          <span>Legacy CPM {formatCpm(vendorCpm)} → Decoupled Media & Creative CPM {formatCpm(padsquadAllInCpm)}</span>
+          <span className="text-[var(--ps-pink)] font-semibold">saving {formatCpm(cpmSavings)} per thousand</span>
         </span>
       </div>
 
       {/* Comparison bars */}
       <div className="ps-card p-5 ps-reveal" style={{ animationDelay: '300ms' }}>
         <div className="ps-col-header ps-col-header--gray mb-4">Impression Comparison</div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           <ComparisonBar label="Legacy Media Model" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={350} />
           <ComparisonBar label="AdCanvas CaaS" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
         </div>

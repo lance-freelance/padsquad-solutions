@@ -200,10 +200,11 @@ const styles = StyleSheet.create({
  * PdfDocument — matches the on-screen branded dark-navy, two-column,
  * pill-badge timeline design.
  */
-export function PdfDocument({ milestones = [], anchorDate, dateType, designMode }) {
+export function PdfDocument({ milestones = [], anchorDate, dateType, designMode, smartCommerce }) {
   const anchorStr  = anchorDate ? format(anchorDate, 'MMM d, yyyy') : '—'
   const modeStr    = dateType === 'go-live' ? 'Go-live' : 'Kick-off'
   const designStr  = designMode === 'client' ? 'Client design' : 'PadSquad design'
+  const commerceStr = smartCommerce ? ' · Smart Commerce (+7 BD lead)' : ''
   const lastIndex  = milestones.length - 1
 
   const splitAt = Math.ceil(milestones.length / 2)
@@ -245,7 +246,7 @@ export function PdfDocument({ milestones = [], anchorDate, dateType, designMode 
           <Text style={styles.brand}>PADSQUAD</Text>
           <Text style={styles.title}>Campaign Timelines & Schedule</Text>
           <Text style={styles.subtitle}>
-            {modeStr} date: {anchorStr} · {designStr}
+            {modeStr} date: {anchorStr} · {designStr}{commerceStr}
           </Text>
         </View>
 

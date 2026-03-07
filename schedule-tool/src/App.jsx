@@ -4,13 +4,52 @@ import { DatePicker } from './components/DatePicker'
 import { DesignToggle } from './components/DesignToggle'
 import { Timeline } from './components/Timeline'
 import { ExportButton } from './components/ExportButton'
-import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES, PADSQUAD_ASSETS_MILESTONES, CLIENT_ASSETS_MILESTONES } from './config/milestones'
+import {
+  getPadSquadDesignMilestones,
+  getClientDesignMilestones,
+  getPadSquadAssetsMilestones,
+  getClientAssetsMilestones,
+  DEFAULT_CREATIVE_DAYS,
+  DEFAULT_DEMO_DAYS,
+  SMART_COMMERCE_LEAD_DAYS,
+} from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
+  businessDaysBetween,
+  getHolidaysInRange,
 } from './utils/businessDays'
 
 const TIMELINE_EXPORT_ID = 'campaign-timeline-export'
+
+function DaysStepper({ label, value, onChange, min = 1, max = 20 }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] tracking-[0.16em] font-semibold text-[var(--ps-muted)] uppercase">
+        {label}
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, value - 1))}
+          disabled={value <= min}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-sm font-bold text-[var(--ps-textSoft)] bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors select-none"
+          aria-label={`Decrease ${label}`}
+        >−</button>
+        <span className="tabular-nums text-sm font-semibold text-white w-14 text-center">
+          {value} {value === 1 ? 'day' : 'days'}
+        </span>
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          disabled={value >= max}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-sm font-bold text-[var(--ps-textSoft)] bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors select-none"
+          aria-label={`Increase ${label}`}
+        >+</button>
+      </div>
+    </div>
+  )
+}
 
 function App() {
   const [date, setDate] = useState(null)
@@ -18,12 +57,24 @@ function App() {
   const [designMode, setDesignMode] = useState('padSquad')
   const [assetsReady, setAssetsReady] = useState(false)
   const [activeTarget, setActiveTarget] = useState('kick-off')
+  const [creativeDays, setCreativeDays] = useState(DEFAULT_CREATIVE_DAYS)
+  const [demoDays, setDemoDays] = useState(DEFAULT_DEMO_DAYS)
+  const [smartCommerce, setSmartCommerce] = useState(false)
+  const [showBuildSettings, setShowBuildSettings] = useState(false)
   const timelineRef = useRef(null)
 
+
   // 2×2 matrix: design ownership × asset readiness
-  const milestonesConfig = designMode === 'padSquad'
-    ? (assetsReady ? PADSQUAD_ASSETS_MILESTONES : PADSQUAD_DESIGN_MILESTONES)
-    : (assetsReady ? CLIENT_ASSETS_MILESTONES   : CLIENT_DESIGN_MILESTONES)
+  const milestonesConfig = useMemo(() => {
+    if (designMode === 'padSquad') {
+      return assetsReady
+        ? getPadSquadAssetsMilestones(demoDays)
+        : getPadSquadDesignMilestones(creativeDays, demoDays)
+    }
+    return assetsReady
+      ? getClientAssetsMilestones(demoDays)
+      : getClientDesignMilestones(demoDays)
+  }, [designMode, assetsReady, creativeDays, demoDays])
 
   const milestones = useMemo(() => {
     if (!date) return []
@@ -32,11 +83,30 @@ function App() {
     }
     const totalBD = milestonesConfig[milestonesConfig.length - 1]?.bdOffset ?? 21
     return getMilestoneDatesFromGoLive(date, totalBD, milestonesConfig)
-  }, [date, dateType, designMode, assetsReady, milestonesConfig])
+  }, [date, dateType, milestonesConfig])
 
   const kickOffDate = milestones?.[0]?.date
   const goLiveDate = milestones?.[milestones.length - 1]?.date
   const anchorDate = date
+
+  // Past-date warning: check if the first milestone is in the past or within 3 BD
+  const timelineWarning = useMemo(() => {
+    if (!kickOffDate) return null
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const kick = new Date(kickOffDate)
+    kick.setHours(0, 0, 0, 0)
+    if (kick < today) return 'past'
+    const bdAway = businessDaysBetween(today, kick)
+    if (bdAway <= 3) return 'caution'
+    return null
+  }, [kickOffDate])
+
+  // Holidays that fall within the campaign window (to inject into the timeline)
+  const holidays = useMemo(() => {
+    if (!kickOffDate || !goLiveDate) return []
+    return getHolidaysInRange(kickOffDate, goLiveDate)
+  }, [kickOffDate, goLiveDate])
 
   const onSelectCalendarDate = (d) => {
     if (!d) return
@@ -144,7 +214,10 @@ function App() {
 
         {/* ASSETS CONFIRMATION */}
         <div className="mb-8">
-          <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
+          {/* Checkboxes row */}
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
+          {/* Assets checkbox */}
+          <label className="flex items-center gap-3 cursor-pointer select-none group">
             <span className="relative flex-shrink-0">
               <input
                 type="checkbox"
@@ -161,15 +234,67 @@ function App() {
                 <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
-            <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
-              Assets received by PadSquad
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                Assets received by PadSquad
+              </span>
+              <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                Client-provided, approved design files in hand
+              </span>
             </span>
           </label>
+
+          {/* Smart Commerce checkbox */}
+          <label className="flex items-center gap-3 cursor-pointer select-none group">
+            <span className="relative flex-shrink-0">
+              <input
+                type="checkbox"
+                checked={smartCommerce}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  setSmartCommerce(checked)
+                  setDemoDays((d) => checked ? d + SMART_COMMERCE_LEAD_DAYS : Math.max(1, d - SMART_COMMERCE_LEAD_DAYS))
+                }}
+                className="ps-checkbox"
+              />
+              <svg
+                className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${smartCommerce ? 'opacity-100' : 'opacity-0'}`}
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden
+              >
+                <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                Smart Commerce
+              </span>
+              <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                Adds {SMART_COMMERCE_LEAD_DAYS} BD to demo development for retailer data setup
+              </span>
+            </span>
+          </label>
+          </div>{/* end checkboxes row */}
         </div>
+
+        {/* TIMELINE WARNING */}
+        {timelineWarning === 'past' && (
+          <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(239,68,68,0.12)] border border-[rgba(239,68,68,0.3)] text-[#F87171] text-sm font-medium flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            The kick-off date has passed — please select a future date to build an accurate timeline.
+          </div>
+        )}
+        {timelineWarning === 'caution' && (
+          <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(251,191,36,0.12)] border border-[rgba(251,191,36,0.3)] text-[#FBBF24] text-sm font-medium flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Heads up — kick-off is within 3 business days. Confirm this timeline is still on track.
+          </div>
+        )}
 
         {/* TIMELINE */}
         <section className="grid grid-cols-1 gap-6">
-          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} />
+          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} timelineWarning={timelineWarning} holidays={holidays} />
           <div
             className="flex items-center justify-between px-5 py-4 rounded-xl"
             style={{
@@ -186,7 +311,49 @@ function App() {
               anchorDate={anchorDate}
               dateType={dateType}
               designMode={designMode}
+              smartCommerce={smartCommerce}
             />
+          </div>
+
+          {/* Build timeline day controls — below timeline, collapsed by default */}
+          <div className="ps-card overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowBuildSettings((v) => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase">
+                  Build Timeline Settings
+                </span>
+                {!showBuildSettings && (
+                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60 tabular-nums">
+                    {designMode === 'padSquad' && !assetsReady ? `Creative ${creativeDays}d · ` : ''}Demo {demoDays}d
+                  </span>
+                )}
+              </div>
+              <span className="text-[var(--ps-muted)] group-hover:text-[var(--ps-textSoft)] transition-colors text-xs font-semibold">
+                {showBuildSettings ? 'Done' : 'Adjust'}
+              </span>
+            </button>
+            {showBuildSettings && (
+              <div className="px-5 pb-5 border-t border-[var(--ps-divider)]">
+                <div className="flex flex-wrap gap-x-8 gap-y-4 items-end pt-4">
+                  {designMode === 'padSquad' && !assetsReady && (
+                    <DaysStepper
+                      label="Creative Development"
+                      value={creativeDays}
+                      onChange={setCreativeDays}
+                    />
+                  )}
+                  <DaysStepper
+                    label="Demo Development"
+                    value={demoDays}
+                    onChange={setDemoDays}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>
