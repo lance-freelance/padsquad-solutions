@@ -29,7 +29,9 @@ export function DatePicker({
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const baseMonth = startOfMonth(new Date())
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const baseMonth = startOfMonth(today)
   const hasBoth = !!kickOffDate && !!goLiveDate
   const start = hasBoth
     ? isBefore(kickOffDate, goLiveDate)
@@ -50,7 +52,7 @@ export function DatePicker({
         numberOfMonths={isMobile ? 1 : 2}
         pagedNavigation
         showOutsideDays
-        disabled={[{ dayOfWeek: [0, 6] }]}
+        disabled={[{ dayOfWeek: [0, 6] }, { before: today }]}
         formatters={{
           formatWeekdayName: (weekdayDate) => {
             // Exactly 2 characters, never truncated.

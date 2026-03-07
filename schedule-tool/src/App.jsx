@@ -60,6 +60,7 @@ function App() {
   const [demoDays, setDemoDays] = useState(DEFAULT_DEMO_DAYS)
   const [adCommerce, setAdCommerce] = useState(false)
   const [smartCommerce, setSmartCommerce] = useState(false)
+  const [showBuildSettings, setShowBuildSettings] = useState(false)
   const timelineRef = useRef(null)
 
   const handleAdCommerceToggle = (checked) => {
@@ -211,8 +212,10 @@ function App() {
 
         {/* ASSETS CONFIRMATION + BUILD TIMELINE CONTROLS */}
         <div className="mb-8 space-y-5">
+          {/* Checkboxes row */}
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
           {/* Assets checkbox */}
-          <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
+          <label className="flex items-center gap-3 cursor-pointer select-none group">
             <span className="relative flex-shrink-0">
               <input
                 type="checkbox"
@@ -235,7 +238,7 @@ function App() {
           </label>
 
           {/* Smart Commerce checkbox */}
-          <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
+          <label className="flex items-center gap-3 cursor-pointer select-none group">
             <span className="relative flex-shrink-0">
               <input
                 type="checkbox"
@@ -261,58 +264,79 @@ function App() {
               </span>
             </span>
           </label>
+          </div>{/* end checkboxes row */}
 
-          {/* Build timeline day controls */}
-          <div className="ps-card p-5">
-            <div className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase mb-4">
-              Build Timeline
-            </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-4 items-end">
-              {/* Creative dev days — only applies when PadSquad designs and no assets yet */}
-              {designMode === 'padSquad' && !assetsReady && (
-                <DaysStepper
-                  label="Creative Development"
-                  value={creativeDays}
-                  onChange={setCreativeDays}
-                />
-              )}
-              {/* Demo dev days — always relevant */}
-              <DaysStepper
-                label="Demo Development"
-                value={demoDays}
-                onChange={(v) => {
-                  setDemoDays(v)
-                  if (adCommerce && v !== AD_COMMERCE_DEMO_DAYS) setAdCommerce(false)
-                }}
-              />
-              {/* Ad Commerce toggle */}
-              <label className="inline-flex items-center gap-2.5 cursor-pointer select-none group self-end pb-0.5">
-                <span className="relative flex-shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={adCommerce}
-                    onChange={(e) => handleAdCommerceToggle(e.target.checked)}
-                    className="ps-checkbox"
+          {/* Build timeline day controls — collapsed by default */}
+          <div className="ps-card overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowBuildSettings((v) => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase">
+                  Build Timeline
+                </span>
+                {!showBuildSettings && (
+                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60 tabular-nums">
+                    {designMode === 'padSquad' && !assetsReady ? `Creative ${creativeDays}d · ` : ''}Demo {demoDays}d{adCommerce ? ' · Ad Commerce' : ''}
+                  </span>
+                )}
+              </div>
+              <span className="text-[var(--ps-muted)] group-hover:text-[var(--ps-textSoft)] transition-colors text-xs font-semibold">
+                {showBuildSettings ? 'Done' : 'Adjust'}
+              </span>
+            </button>
+            {showBuildSettings && (
+              <div className="px-5 pb-5 border-t border-[var(--ps-divider)]">
+                <div className="flex flex-wrap gap-x-8 gap-y-4 items-end pt-4">
+                  {/* Creative dev days — only applies when PadSquad designs and no assets yet */}
+                  {designMode === 'padSquad' && !assetsReady && (
+                    <DaysStepper
+                      label="Creative Development"
+                      value={creativeDays}
+                      onChange={setCreativeDays}
+                    />
+                  )}
+                  {/* Demo dev days — always relevant */}
+                  <DaysStepper
+                    label="Demo Development"
+                    value={demoDays}
+                    onChange={(v) => {
+                      setDemoDays(v)
+                      if (adCommerce && v !== AD_COMMERCE_DEMO_DAYS) setAdCommerce(false)
+                    }}
                   />
-                  <svg
-                    className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${adCommerce ? 'opacity-100' : 'opacity-0'}`}
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    aria-hidden
-                  >
-                    <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
-                <span className="flex flex-col gap-0.5">
-                  <span className="text-[11px] tracking-[0.1em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
-                    Ad Commerce / Game Build
-                  </span>
-                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
-                    Presets demo dev to {AD_COMMERCE_DEMO_DAYS} days
-                  </span>
-                </span>
-              </label>
-            </div>
+                  {/* Ad Commerce toggle */}
+                  <label className="inline-flex items-center gap-2.5 cursor-pointer select-none group self-end pb-0.5">
+                    <span className="relative flex-shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={adCommerce}
+                        onChange={(e) => handleAdCommerceToggle(e.target.checked)}
+                        className="ps-checkbox"
+                      />
+                      <svg
+                        className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${adCommerce ? 'opacity-100' : 'opacity-0'}`}
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        aria-hidden
+                      >
+                        <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </span>
+                    <span className="flex flex-col gap-0.5">
+                      <span className="text-[11px] tracking-[0.1em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                        Ad Commerce / Game Build
+                      </span>
+                      <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                        Presets demo dev to {AD_COMMERCE_DEMO_DAYS} days
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -320,13 +344,13 @@ function App() {
         {timelineWarning === 'past' && (
           <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(239,68,68,0.12)] border border-[rgba(239,68,68,0.3)] text-[#F87171] text-sm font-medium flex items-center gap-3">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            This timeline is no longer achievable — the kick-off date has already passed.
+            The kick-off date has passed — please select a future date to build an accurate timeline.
           </div>
         )}
         {timelineWarning === 'caution' && (
           <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(251,191,36,0.12)] border border-[rgba(251,191,36,0.3)] text-[#FBBF24] text-sm font-medium flex items-center gap-3">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            Tight timeline — kick-off is within 3 business days.
+            Heads up — kick-off is within 3 business days. Confirm this timeline is still on track.
           </div>
         )}
 
