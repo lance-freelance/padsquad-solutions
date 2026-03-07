@@ -11,6 +11,7 @@ import {
   getClientAssetsMilestones,
   DEFAULT_CREATIVE_DAYS,
   DEFAULT_DEMO_DAYS,
+  SMART_COMMERCE_LEAD_DAYS,
 } from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
@@ -67,13 +68,13 @@ function App() {
   const milestonesConfig = useMemo(() => {
     if (designMode === 'padSquad') {
       return assetsReady
-        ? getPadSquadAssetsMilestones(demoDays, smartCommerce)
-        : getPadSquadDesignMilestones(creativeDays, demoDays, smartCommerce)
+        ? getPadSquadAssetsMilestones(demoDays)
+        : getPadSquadDesignMilestones(creativeDays, demoDays)
     }
     return assetsReady
-      ? getClientAssetsMilestones(demoDays, smartCommerce)
-      : getClientDesignMilestones(demoDays, smartCommerce)
-  }, [designMode, assetsReady, creativeDays, demoDays, smartCommerce])
+      ? getClientAssetsMilestones(demoDays)
+      : getClientDesignMilestones(demoDays)
+  }, [designMode, assetsReady, creativeDays, demoDays])
 
   const milestones = useMemo(() => {
     if (!date) return []
@@ -249,7 +250,11 @@ function App() {
               <input
                 type="checkbox"
                 checked={smartCommerce}
-                onChange={(e) => setSmartCommerce(e.target.checked)}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  setSmartCommerce(checked)
+                  setDemoDays((d) => checked ? d + SMART_COMMERCE_LEAD_DAYS : Math.max(1, d - SMART_COMMERCE_LEAD_DAYS))
+                }}
                 className="ps-checkbox"
               />
               <svg
@@ -266,7 +271,7 @@ function App() {
                 Smart Commerce
               </span>
               <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
-                Adds 7 BD lead time for retailer data requirements
+                Adds {SMART_COMMERCE_LEAD_DAYS} BD to demo development for retailer data setup
               </span>
             </span>
           </label>
