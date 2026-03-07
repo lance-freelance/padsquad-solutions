@@ -1,5 +1,5 @@
 /**
- * Milestone configs — all BDs measured from kick-off (BD 0).
+ * Milestone config factories — all BDs measured from kick-off (BD 0).
  *
  * Two axes: design ownership × asset readiness → 4 workflows.
  *
@@ -11,91 +11,105 @@
  *   Unchecked → standard timelines.
  *   Checked   → expedited timelines (assets in hand, fewer review rounds).
  *
- *   No  + No assets  → PADSQUAD_DESIGN_MILESTONES       21 BDs
- *   No  + Assets     → PADSQUAD_ASSETS_MILESTONES       12 BDs
- *   Yes + No assets  → CLIENT_DESIGN_MILESTONES         13 BDs
- *   Yes + Assets     → CLIENT_ASSETS_MILESTONES          8 BDs
+ * creativeDays — editable duration of the creative build phase (default: 1 BD)
+ *   Applies only to PadSquad design + no assets (the only workflow with a full
+ *   creative development step).
+ *
+ * demoDays — editable duration of the demo build phase (default: 1 BD)
+ *   Applies to all four workflows. Increase for interactive / game / Ad Commerce
+ *   builds that require more development time.
  *
  * isClientAction: true = client-owned gate; the schedule slips if missed.
  */
 
 /**
  * PadSquad designs — client answers "No" to "Will you provide the design?"
- * 21 BDs, 15 steps.
- * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
+ * Has both a creative development phase and a demo development phase.
  */
-export const PADSQUAD_DESIGN_MILESTONES = [
-  { label: 'Assets received',               bdOffset: 0  },
-  { label: 'Creative development',          bdOffset: 1  },
-  { label: 'Creative review R1',            bdOffset: 2,  isClientAction: true },
-  { label: 'Creative feedback due',         bdOffset: 3,  isClientAction: true },
-  { label: 'Creative feedback implemented', bdOffset: 4  },
-  { label: 'Creative review R2',            bdOffset: 7,  isClientAction: true },
-  { label: 'Creative approval',             bdOffset: 8,  isClientAction: true },
-  { label: 'Demo development',              bdOffset: 10 },
-  { label: 'Demo review R1',                bdOffset: 11, isClientAction: true },
-  { label: 'Demo feedback due',             bdOffset: 15, isClientAction: true },
-  { label: 'Demo feedback implemented',     bdOffset: 16 },
-  { label: 'Demo review R2',                bdOffset: 17, isClientAction: true },
-  { label: 'Client approval',               bdOffset: 18, isClientAction: true },
-  { label: 'QA & trafficking',              bdOffset: 20 },
-  { label: 'Campaign launch',               bdOffset: 21 },
-]
+export function getPadSquadDesignMilestones(creativeDays = 1, demoDays = 1) {
+  const cd = creativeDays
+  const dd = demoDays
+  return [
+    { label: 'Assets received',               bdOffset: 0 },
+    { label: 'Creative development',          bdOffset: cd },
+    { label: 'Creative review R1',            bdOffset: cd + 1,      isClientAction: true },
+    { label: 'Creative feedback due',         bdOffset: cd + 2,      isClientAction: true },
+    { label: 'Creative feedback implemented', bdOffset: cd + 3 },
+    { label: 'Creative review R2',            bdOffset: cd + 6,      isClientAction: true },
+    { label: 'Creative approval',             bdOffset: cd + 7,      isClientAction: true },
+    { label: 'Demo development',              bdOffset: cd + 9 },
+    { label: 'Demo review R1',                bdOffset: cd + 9 + dd,     isClientAction: true },
+    { label: 'Demo feedback due',             bdOffset: cd + 9 + dd + 4, isClientAction: true },
+    { label: 'Demo feedback implemented',     bdOffset: cd + 9 + dd + 5 },
+    { label: 'Demo review R2',                bdOffset: cd + 9 + dd + 6, isClientAction: true },
+    { label: 'Client approval',               bdOffset: cd + 9 + dd + 7, isClientAction: true },
+    { label: 'QA & trafficking',              bdOffset: cd + 9 + dd + 9 },
+    { label: 'Campaign launch',               bdOffset: cd + 9 + dd + 10 },
+  ]
+}
 
 /**
  * Client provides design — client answers "Yes" to "Will you provide the design?"
  * Client delivers pre-approved design files; PadSquad builds demos only.
- * 13 BDs, 9 steps.
- * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
  */
-export const CLIENT_DESIGN_MILESTONES = [
-  { label: 'Design files received',      bdOffset: 0  },
-  { label: 'Demo development',           bdOffset: 2  },
-  { label: 'Demo review R1',             bdOffset: 3,  isClientAction: true },
-  { label: 'Demo feedback due',          bdOffset: 7,  isClientAction: true },
-  { label: 'Demo feedback implemented',  bdOffset: 8  },
-  { label: 'Demo review R2',             bdOffset: 9,  isClientAction: true },
-  { label: 'Client approval',            bdOffset: 10, isClientAction: true },
-  { label: 'QA & trafficking',           bdOffset: 12 },
-  { label: 'Campaign launch',            bdOffset: 13 },
-]
+export function getClientDesignMilestones(demoDays = 1) {
+  const dd = demoDays
+  return [
+    { label: 'Design files received',      bdOffset: 0 },
+    { label: 'Demo development',           bdOffset: 2 },
+    { label: 'Demo review R1',             bdOffset: 2 + dd,      isClientAction: true },
+    { label: 'Demo feedback due',          bdOffset: 2 + dd + 4,  isClientAction: true },
+    { label: 'Demo feedback implemented',  bdOffset: 2 + dd + 5 },
+    { label: 'Demo review R2',             bdOffset: 2 + dd + 6,  isClientAction: true },
+    { label: 'Client approval',            bdOffset: 2 + dd + 7,  isClientAction: true },
+    { label: 'QA & trafficking',           bdOffset: 2 + dd + 9 },
+    { label: 'Campaign launch',            bdOffset: 2 + dd + 10 },
+  ]
+}
 
 /**
  * PadSquad designs + assets in hand.
- * Assets received; PadSquad creates creative layout for review before
- * building demos. Expedited: 1 creative review round instead of 2.
- * 12 BDs, 12 steps.
- * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
+ * Assets received; PadSquad creates creative layout before building demos.
+ * Expedited: 1 creative review round instead of 2.
  */
-export const PADSQUAD_ASSETS_MILESTONES = [
-  { label: 'Assets received',              bdOffset: 0  },
-  { label: 'Creative layout sent',         bdOffset: 2  },
-  { label: 'Creative feedback due',        bdOffset: 3,  isClientAction: true },
-  { label: 'Creative revisions sent',      bdOffset: 4  },
-  { label: 'Creative approval',            bdOffset: 5,  isClientAction: true },
-  { label: 'Demo development',             bdOffset: 6  },
-  { label: 'Demo review R1',               bdOffset: 7,  isClientAction: true },
-  { label: 'Demo feedback due',            bdOffset: 8,  isClientAction: true },
-  { label: 'Demo feedback implemented',    bdOffset: 9  },
-  { label: 'Client approval',              bdOffset: 10, isClientAction: true },
-  { label: 'QA & trafficking',             bdOffset: 11 },
-  { label: 'Campaign launch',              bdOffset: 12 },
-]
+export function getPadSquadAssetsMilestones(demoDays = 1) {
+  const dd = demoDays
+  return [
+    { label: 'Assets received',              bdOffset: 0 },
+    { label: 'Creative layout sent',         bdOffset: 2 },
+    { label: 'Creative feedback due',        bdOffset: 3,      isClientAction: true },
+    { label: 'Creative revisions sent',      bdOffset: 4 },
+    { label: 'Creative approval',            bdOffset: 5,      isClientAction: true },
+    { label: 'Demo development',             bdOffset: 6 },
+    { label: 'Demo review R1',               bdOffset: 6 + dd,     isClientAction: true },
+    { label: 'Demo feedback due',            bdOffset: 6 + dd + 1, isClientAction: true },
+    { label: 'Demo feedback implemented',    bdOffset: 6 + dd + 2 },
+    { label: 'Client approval',              bdOffset: 6 + dd + 3, isClientAction: true },
+    { label: 'QA & trafficking',             bdOffset: 6 + dd + 4 },
+    { label: 'Campaign launch',              bdOffset: 6 + dd + 5 },
+  ]
+}
 
 /**
  * Client provides design + assets in hand.
- * Design files and assets received; PadSquad jumps straight to demo
- * development. Expedited: 1 demo review round, no R2.
- * 8 BDs, 8 steps.
- * @type {{ label: string, bdOffset: number, isClientAction?: boolean }[]}
+ * Design files and assets received; PadSquad jumps straight to demo development.
+ * Expedited: 1 demo review round, no R2.
  */
-export const CLIENT_ASSETS_MILESTONES = [
-  { label: 'Design files & assets received', bdOffset: 0  },
-  { label: 'Demo development',               bdOffset: 1  },
-  { label: 'Demo review R1',                 bdOffset: 2,  isClientAction: true },
-  { label: 'Demo feedback due',              bdOffset: 3,  isClientAction: true },
-  { label: 'Demo feedback implemented',      bdOffset: 4  },
-  { label: 'Client approval',                bdOffset: 5,  isClientAction: true },
-  { label: 'QA & trafficking',               bdOffset: 7  },
-  { label: 'Campaign launch',                bdOffset: 8  },
-]
+export function getClientAssetsMilestones(demoDays = 1) {
+  const dd = demoDays
+  return [
+    { label: 'Design files & assets received', bdOffset: 0 },
+    { label: 'Demo development',               bdOffset: 1 },
+    { label: 'Demo review R1',                 bdOffset: 1 + dd,     isClientAction: true },
+    { label: 'Demo feedback due',              bdOffset: 1 + dd + 1, isClientAction: true },
+    { label: 'Demo feedback implemented',      bdOffset: 1 + dd + 2 },
+    { label: 'Client approval',                bdOffset: 1 + dd + 3, isClientAction: true },
+    { label: 'QA & trafficking',               bdOffset: 1 + dd + 5 },
+    { label: 'Campaign launch',                bdOffset: 1 + dd + 6 },
+  ]
+}
+
+// Default day values
+export const DEFAULT_CREATIVE_DAYS = 1
+export const DEFAULT_DEMO_DAYS = 1
+export const AD_COMMERCE_DEMO_DAYS = 5

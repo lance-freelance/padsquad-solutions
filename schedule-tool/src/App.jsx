@@ -4,7 +4,15 @@ import { DatePicker } from './components/DatePicker'
 import { DesignToggle } from './components/DesignToggle'
 import { Timeline } from './components/Timeline'
 import { ExportButton } from './components/ExportButton'
-import { PADSQUAD_DESIGN_MILESTONES, CLIENT_DESIGN_MILESTONES, PADSQUAD_ASSETS_MILESTONES, CLIENT_ASSETS_MILESTONES } from './config/milestones'
+import {
+  getPadSquadDesignMilestones,
+  getClientDesignMilestones,
+  getPadSquadAssetsMilestones,
+  getClientAssetsMilestones,
+  DEFAULT_CREATIVE_DAYS,
+  DEFAULT_DEMO_DAYS,
+  AD_COMMERCE_DEMO_DAYS,
+} from './config/milestones'
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
@@ -12,18 +20,62 @@ import {
 
 const TIMELINE_EXPORT_ID = 'campaign-timeline-export'
 
+function DaysStepper({ label, value, onChange, min = 1, max = 20 }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] tracking-[0.16em] font-semibold text-[var(--ps-muted)] uppercase">
+        {label}
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, value - 1))}
+          disabled={value <= min}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-sm font-bold text-[var(--ps-textSoft)] bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors select-none"
+          aria-label={`Decrease ${label}`}
+        >−</button>
+        <span className="tabular-nums text-sm font-semibold text-white w-14 text-center">
+          {value} {value === 1 ? 'day' : 'days'}
+        </span>
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          disabled={value >= max}
+          className="w-7 h-7 rounded-md flex items-center justify-center text-sm font-bold text-[var(--ps-textSoft)] bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors select-none"
+          aria-label={`Increase ${label}`}
+        >+</button>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [date, setDate] = useState(null)
   const [dateType, setDateType] = useState('kick-off')
   const [designMode, setDesignMode] = useState('padSquad')
   const [assetsReady, setAssetsReady] = useState(false)
   const [activeTarget, setActiveTarget] = useState('kick-off')
+  const [creativeDays, setCreativeDays] = useState(DEFAULT_CREATIVE_DAYS)
+  const [demoDays, setDemoDays] = useState(DEFAULT_DEMO_DAYS)
+  const [adCommerce, setAdCommerce] = useState(false)
   const timelineRef = useRef(null)
 
+  const handleAdCommerceToggle = (checked) => {
+    setAdCommerce(checked)
+    setDemoDays(checked ? AD_COMMERCE_DEMO_DAYS : DEFAULT_DEMO_DAYS)
+  }
+
   // 2×2 matrix: design ownership × asset readiness
-  const milestonesConfig = designMode === 'padSquad'
-    ? (assetsReady ? PADSQUAD_ASSETS_MILESTONES : PADSQUAD_DESIGN_MILESTONES)
-    : (assetsReady ? CLIENT_ASSETS_MILESTONES   : CLIENT_DESIGN_MILESTONES)
+  const milestonesConfig = useMemo(() => {
+    if (designMode === 'padSquad') {
+      return assetsReady
+        ? getPadSquadAssetsMilestones(demoDays)
+        : getPadSquadDesignMilestones(creativeDays, demoDays)
+    }
+    return assetsReady
+      ? getClientAssetsMilestones(demoDays)
+      : getClientDesignMilestones(demoDays)
+  }, [designMode, assetsReady, creativeDays, demoDays])
 
   const milestones = useMemo(() => {
     if (!date) return []
@@ -32,7 +84,7 @@ function App() {
     }
     const totalBD = milestonesConfig[milestonesConfig.length - 1]?.bdOffset ?? 21
     return getMilestoneDatesFromGoLive(date, totalBD, milestonesConfig)
-  }, [date, dateType, designMode, assetsReady, milestonesConfig])
+  }, [date, dateType, milestonesConfig])
 
   const kickOffDate = milestones?.[0]?.date
   const goLiveDate = milestones?.[milestones.length - 1]?.date
@@ -142,8 +194,9 @@ function App() {
           </div>
         </section>
 
-        {/* ASSETS CONFIRMATION */}
-        <div className="mb-8">
+        {/* ASSETS CONFIRMATION + BUILD TIMELINE CONTROLS */}
+        <div className="mb-8 space-y-5">
+          {/* Assets checkbox */}
           <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
             <span className="relative flex-shrink-0">
               <input
@@ -165,6 +218,59 @@ function App() {
               Assets received by PadSquad
             </span>
           </label>
+
+          {/* Build timeline day controls */}
+          <div className="ps-card p-5">
+            <div className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase mb-4">
+              Build Timeline
+            </div>
+            <div className="flex flex-wrap gap-x-8 gap-y-4 items-end">
+              {/* Creative dev days — only applies when PadSquad designs and no assets yet */}
+              {designMode === 'padSquad' && !assetsReady && (
+                <DaysStepper
+                  label="Creative Development"
+                  value={creativeDays}
+                  onChange={setCreativeDays}
+                />
+              )}
+              {/* Demo dev days — always relevant */}
+              <DaysStepper
+                label="Demo Development"
+                value={demoDays}
+                onChange={(v) => {
+                  setDemoDays(v)
+                  if (adCommerce && v !== AD_COMMERCE_DEMO_DAYS) setAdCommerce(false)
+                }}
+              />
+              {/* Ad Commerce toggle */}
+              <label className="inline-flex items-center gap-2.5 cursor-pointer select-none group self-end pb-0.5">
+                <span className="relative flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={adCommerce}
+                    onChange={(e) => handleAdCommerceToggle(e.target.checked)}
+                    className="ps-checkbox"
+                  />
+                  <svg
+                    className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${adCommerce ? 'opacity-100' : 'opacity-0'}`}
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    aria-hidden
+                  >
+                    <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-[11px] tracking-[0.1em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                    Ad Commerce / Game Build
+                  </span>
+                  <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                    Presets demo dev to {AD_COMMERCE_DEMO_DAYS} days
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
         </div>
 
         {/* TIMELINE */}
