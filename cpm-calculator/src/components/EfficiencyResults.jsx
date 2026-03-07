@@ -117,7 +117,7 @@ export function EfficiencyResults({ results, budget }) {
       {/* Prominent scenario summary — savings → working media narrative */}
       <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
         <div className="text-[10px] font-bold tracking-[0.18em] text-[var(--ps-pink)] uppercase mb-3">
-          Your CPM Savings
+          What AdCanvas Unlocks
         </div>
         <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
           With a {budgetDisplay} budget, AdCanvas Creative as a Service reduces your effective CPM from{' '}
