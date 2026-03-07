@@ -47,10 +47,6 @@ export function DatePicker({
 
   return (
     <div className="ps-card ps-card--calendar">
-      <div className="flex items-center gap-2 pb-2 px-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-[#F59E0B] opacity-80" />
-        <span className="text-[10px] text-[#F59E0B] opacity-70 tracking-[0.08em]">Federal holiday — office closed</span>
-      </div>
       <DayPicker
         mode="single"
         defaultMonth={baseMonth}
@@ -103,6 +99,14 @@ export function DatePicker({
           outside: 'ps-rdp__outside',
         }}
       />
+      <div className="flex justify-end px-4 pb-3 pt-1">
+        <div className="flex items-center gap-1.5">
+          <span className="inline-block w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#F59E0B', opacity: 0.7 }} />
+          <span className="text-[10px] tracking-[0.08em] text-[var(--ps-muted)] opacity-70">
+            Federal holiday — office closed
+          </span>
+        </div>
+      </div>
     </div>
   )
 }

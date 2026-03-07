@@ -233,8 +233,13 @@ function App() {
                 <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
-            <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
-              Assets received by PadSquad
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                Assets received by PadSquad
+              </span>
+              <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                Client-provided, approved design files in hand
+              </span>
             </span>
           </label>
 
