@@ -1,7 +1,7 @@
 import { formatNumber, formatCurrency, formatMultiplier, formatCompact, formatCpm } from '../utils/calculations'
 import { useCountUp } from '../hooks/useCountUp'
 
-function HeroStat({ value, label, subtitle, accent, prefix = '', delay = 0 }) {
+function HeroStat({ value, label, tag, accent, prefix = '', delay = 0 }) {
   const animated = useCountUp(value)
   const colorClass =
     accent === 'pink' ? 'text-[var(--ps-pink)]' :
@@ -18,11 +18,11 @@ function HeroStat({ value, label, subtitle, accent, prefix = '', delay = 0 }) {
 
   return (
     <div className={`ps-card p-5 text-center ps-reveal`} style={{ animationDelay: `${delay}ms` }}>
+      {tag && (
+        <div className="text-[9px] font-bold tracking-[0.1em] text-[var(--ps-muted)] uppercase mb-1">{tag}</div>
+      )}
       <div className={`ps-hero-value ${colorClass}`}>{displayVal}</div>
       <div className="ps-hero-label">{label}</div>
-      {subtitle && (
-        <div className="text-[9px] text-[var(--ps-muted)] tracking-[0.06em] mt-1">{subtitle}</div>
-      )}
     </div>
   )
 }
@@ -71,23 +71,27 @@ export function EfficiencyResults({ results, budget }) {
       {/* What you get now — minimized baseline */}
       <div className="text-center py-3 ps-reveal" style={{ animationDelay: '0ms' }}>
         <div className="text-[10px] font-bold tracking-[0.14em] text-[var(--ps-muted)] uppercase mb-1">
-          Your Current Plan
+          Under the Legacy Media Model
         </div>
         <div className="text-sm text-[var(--ps-textSoft)]">
+          Your{' '}
+          <span className="font-semibold text-white">{budgetDisplay}</span>{' '}
+          buys{' '}
           <span className="font-semibold text-white">{formatCompact(traditionalImpressions)}</span>{' '}
           impressions at{' '}
-          <span className="font-semibold text-white">{formatCpm(vendorCpm)}</span> CPM
+          <span className="font-semibold text-white">{formatCpm(vendorCpm)}</span> CPM{' '}
+          <span className="text-[var(--ps-muted)]">— because you're paying for creative and media in the same line item.</span>
         </div>
       </div>
 
       {/* Hero stat cards — what you unlock */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <HeroStat value={incrementalImpressions} label="Impressions Unlocked" accent="pink" prefix="+" delay={50} />
-        <HeroStat value={reachMultiplier} label="Investment Multiplier" delay={150} />
+        <HeroStat value={incrementalImpressions} label="Additional Impressions" accent="pink" prefix="+" delay={50} />
+        <HeroStat value={reachMultiplier} label="Media Efficiency Multiplier" delay={150} />
         <HeroStat
           value={valueUnlocked}
-          label="Savings"
-          subtitle="reinvested as working media"
+          label="Reinvested as Working Media"
+          tag="Savings"
           accent="pink"
           prefix="$"
           delay={250}
@@ -97,7 +101,7 @@ export function EfficiencyResults({ results, budget }) {
       {/* CPM savings callout */}
       <div className="text-center ps-reveal" style={{ animationDelay: '280ms' }}>
         <span className="inline-flex items-center gap-2 text-xs text-[var(--ps-muted)] bg-[rgba(255,255,255,0.04)] rounded-full px-4 py-2">
-          {formatCpm(vendorCpm)} → {formatCpm(padsquadAllInCpm)} · saving {formatCpm(cpmSavings)} per CPM
+          Legacy CPM {formatCpm(vendorCpm)} → Decoupled Creative CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
         </span>
       </div>
 
@@ -105,20 +109,24 @@ export function EfficiencyResults({ results, budget }) {
       <div className="ps-card p-5 ps-reveal" style={{ animationDelay: '300ms' }}>
         <div className="ps-col-header ps-col-header--gray mb-4">Impression Comparison</div>
         <div className="space-y-3">
-          <ComparisonBar label="Traditional" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={350} />
-          <ComparisonBar label="AdCanvas" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
+          <ComparisonBar label="Legacy Media Model" value={traditionalImpressions} maxValue={maxImps} variant="traditional" delay={350} />
+          <ComparisonBar label="Decoupled Creative (AdCanvas)" value={padsquadImpressions} maxValue={maxImps} variant="padsquad" delay={400} />
         </div>
       </div>
 
       {/* Prominent scenario summary — savings → working media narrative */}
       <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
+        <div className="text-[10px] font-bold tracking-[0.18em] text-[var(--ps-pink)] uppercase mb-3">
+          The Decoupling Dividend
+        </div>
         <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
-          With a {budgetDisplay} budget, AdCanvas reduces your effective CPM from{' '}
+          With a {budgetDisplay} budget, separating creative delivery from your media buy reduces your effective CPM from{' '}
           <span className="text-white font-bold">{formatCpm(vendorCpm)}</span> to{' '}
           <span className="text-[var(--ps-pink)] font-bold">{formatCpm(padsquadAllInCpm)}</span>{' '}
-          — saving{' '}
+          — freeing{' '}
           <span className="text-[var(--ps-pink)] font-bold">{formatCurrency(valueUnlocked)}</span>{' '}
-          that gets reinvested as working media, delivering{' '}
+          that gets reinvested as working media.{' '}
+          <span className="text-white font-semibold">Result:</span>{' '}
           <span className="text-white font-bold">{formatCompact(padsquadImpressions)}</span>{' '}
           impressions vs.{' '}
           <span className="text-white font-bold">{formatCompact(traditionalImpressions)}</span>.

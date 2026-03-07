@@ -34,9 +34,12 @@ export function EcpmTuner({ values, onChange, showAdvanced, onToggleAdvanced, ve
 
   return (
     <div className="ps-card p-6 ps-reveal" style={{ animationDelay: '500ms' }}>
-      <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-purple)] uppercase mb-6">
-        Fine-Tune Your Media Investment
+      <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-purple)] uppercase mb-3">
+        How Decoupling Works
       </div>
+      <p className="text-[14px] text-[var(--ps-muted)] leading-[1.5] max-w-[600px] mb-6">
+        AdCanvas charges a fixed Creative-as-a-Service (CaaS) fee for creative delivery. Your media runs through standard programmatic pipes at market rates. Because creative is no longer baked into your CPM, every dollar saved goes directly to working media.
+      </p>
 
       {/* Programmatic eCPM — capped at vendor rate */}
       <div className="mb-6">
