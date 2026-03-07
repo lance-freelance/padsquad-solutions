@@ -101,7 +101,7 @@ export function EfficiencyResults({ results, budget }) {
       {/* CPM savings callout */}
       <div className="text-center ps-reveal" style={{ animationDelay: '280ms' }}>
         <span className="inline-flex items-center gap-2 text-xs text-[var(--ps-muted)] bg-[rgba(255,255,255,0.04)] rounded-full px-4 py-2">
-          Legacy CPM {formatCpm(vendorCpm)} → AdCanvas CaaS CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
+          Legacy CPM {formatCpm(vendorCpm)} → Decoupled Media & Creative CPM {formatCpm(padsquadAllInCpm)} — saving {formatCpm(cpmSavings)} per thousand
         </span>
       </div>
 
@@ -117,7 +117,7 @@ export function EfficiencyResults({ results, budget }) {
       {/* Prominent scenario summary — savings → working media narrative */}
       <div className="ps-card p-6 text-center ps-reveal" style={{ animationDelay: '450ms' }}>
         <div className="text-[10px] font-bold tracking-[0.18em] text-[var(--ps-pink)] uppercase mb-3">
-          The AdCanvas Efficiency Gain
+          Your CPM Savings
         </div>
         <p className="text-base sm:text-lg text-[var(--ps-textSoft)] leading-relaxed">
           With a {budgetDisplay} budget, AdCanvas Creative as a Service reduces your effective CPM from{' '}
