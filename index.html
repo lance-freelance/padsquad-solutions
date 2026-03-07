@@ -65,7 +65,7 @@
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1.5rem;
         width: 100%;
-        max-width: 720px;
+        max-width: 1080px;
       }
 
       /* ---- Card ---- */
@@ -86,6 +86,7 @@
       }
       .card:nth-child(1) { animation-delay: 100ms; }
       .card:nth-child(2) { animation-delay: 200ms; }
+      .card:nth-child(3) { animation-delay: 300ms; }
 
       .card::before {
         content: '';
@@ -179,6 +180,23 @@
       .card__cta svg { transition: transform 200ms ease; }
       .card:hover .card__cta svg { transform: translateX(4px); }
 
+      /* ---- External badge ---- */
+      .card__external-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.55rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        margin-bottom: 0.25rem;
+        width: fit-content;
+      }
+
       /* ---- Footer ---- */
       footer {
         margin-top: 3rem;
@@ -251,6 +269,35 @@
           Open tool
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </a>
+      <a class="card card--pink" href="https://solutions.padsquad.com/experience-planner" target="_blank" rel="noopener noreferrer">
+        <div class="card__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+        </div>
+        <div class="card__external-badge">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+          External tool
+        </div>
+        <div class="card__label">Creative</div>
+        <div class="card__title">Ad Experience Planner</div>
+        <div class="card__desc">Browse PadSquad ad formats, explore features by objective, and build a shareable spec for your next campaign.</div>
+        <div class="card__cta">
+          Open planner
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
           </svg>
         </div>
       </a>

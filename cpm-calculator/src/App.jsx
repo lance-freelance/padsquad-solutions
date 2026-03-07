@@ -163,7 +163,9 @@ export default function App() {
                 Talk to our team about modeling this for your specific media plan.
               </p>
               <a
-                href="https://padsquad.com/contact"
+                href="https://padsquad.com/contact-us?utm_source=cpm-calculator&utm_medium=tool&utm_campaign=adcanvas-cpm&utm_content=decouple-cta"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--ps-pink)] border border-[var(--ps-pink)] rounded-lg px-5 py-2.5 hover:bg-[var(--ps-pink)] hover:text-white transition-colors"
               >
                 Get in Touch
