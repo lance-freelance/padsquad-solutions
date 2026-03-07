@@ -11,7 +11,7 @@ const PNG_HEIGHT = 900
 /**
  * Export actions: PDF (branded) and PNG (timeline section at 1600×900).
  */
-export function ExportButton({ timelineRef, milestones, anchorDate, dateType, designMode }) {
+export function ExportButton({ timelineRef, milestones, anchorDate, dateType, designMode, smartCommerce }) {
   const [pngBusy, setPngBusy] = useState(false)
 
   const handlePng = async () => {
@@ -59,6 +59,7 @@ export function ExportButton({ timelineRef, milestones, anchorDate, dateType, de
               anchorDate={anchorDate}
               dateType={dateType}
               designMode={designMode}
+              smartCommerce={smartCommerce}
             />
           }
           fileName={`PadSquad_CampaignTimeline_${anchorLabel}.pdf`}

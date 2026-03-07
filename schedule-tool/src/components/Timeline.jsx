@@ -6,7 +6,7 @@ import { format } from 'date-fns'
  * Receives computed milestone entries { label, date, bdOffset, isClientAction }.
  * Steps with isClientAction: true are highlighted as client-owned gates.
  */
-export const Timeline = forwardRef(function Timeline({ milestones, id: timelineId }, ref) {
+export const Timeline = forwardRef(function Timeline({ milestones, id: timelineId, timelineWarning }, ref) {
   if (!milestones || milestones.length === 0) {
     return (
       <div
@@ -24,8 +24,14 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
   const left = milestones.slice(0, splitAt)
   const right = milestones.slice(splitAt)
 
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   const renderItem = (m, globalIndex, localIndex, isFirst) => {
     const isLaunch = globalIndex === lastIndex
+    const mDate = new Date(m.date)
+    mDate.setHours(0, 0, 0, 0)
+    const isPast = timelineWarning === 'past' && mDate < today
     return (
       <li
         key={`${m.label}-${m.bdOffset}`}
@@ -33,6 +39,7 @@ export const Timeline = forwardRef(function Timeline({ milestones, id: timelineI
           'flex items-center gap-4 px-4 py-3',
           localIndex % 2 === 0 ? 'bg-[rgba(255,255,255,0.02)]' : 'bg-transparent',
           isFirst ? '' : 'border-t border-[var(--ps-divider)]',
+          isPast ? 'opacity-40' : '',
         ].join(' ')}
       >
         <div className="flex-shrink-0">

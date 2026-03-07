@@ -16,6 +16,7 @@ import {
 import {
   getMilestoneDatesFromKickOff,
   getMilestoneDatesFromGoLive,
+  businessDaysBetween,
 } from './utils/businessDays'
 
 const TIMELINE_EXPORT_ID = 'campaign-timeline-export'
@@ -58,6 +59,7 @@ function App() {
   const [creativeDays, setCreativeDays] = useState(DEFAULT_CREATIVE_DAYS)
   const [demoDays, setDemoDays] = useState(DEFAULT_DEMO_DAYS)
   const [adCommerce, setAdCommerce] = useState(false)
+  const [smartCommerce, setSmartCommerce] = useState(false)
   const timelineRef = useRef(null)
 
   const handleAdCommerceToggle = (checked) => {
@@ -69,13 +71,13 @@ function App() {
   const milestonesConfig = useMemo(() => {
     if (designMode === 'padSquad') {
       return assetsReady
-        ? getPadSquadAssetsMilestones(demoDays)
-        : getPadSquadDesignMilestones(creativeDays, demoDays)
+        ? getPadSquadAssetsMilestones(demoDays, smartCommerce)
+        : getPadSquadDesignMilestones(creativeDays, demoDays, smartCommerce)
     }
     return assetsReady
-      ? getClientAssetsMilestones(demoDays)
-      : getClientDesignMilestones(demoDays)
-  }, [designMode, assetsReady, creativeDays, demoDays])
+      ? getClientAssetsMilestones(demoDays, smartCommerce)
+      : getClientDesignMilestones(demoDays, smartCommerce)
+  }, [designMode, assetsReady, creativeDays, demoDays, smartCommerce])
 
   const milestones = useMemo(() => {
     if (!date) return []
@@ -89,6 +91,19 @@ function App() {
   const kickOffDate = milestones?.[0]?.date
   const goLiveDate = milestones?.[milestones.length - 1]?.date
   const anchorDate = date
+
+  // Past-date warning: check if the first milestone is in the past or within 3 BD
+  const timelineWarning = useMemo(() => {
+    if (!kickOffDate) return null
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const kick = new Date(kickOffDate)
+    kick.setHours(0, 0, 0, 0)
+    if (kick < today) return 'past'
+    const bdAway = businessDaysBetween(today, kick)
+    if (bdAway <= 3) return 'caution'
+    return null
+  }, [kickOffDate])
 
   const onSelectCalendarDate = (d) => {
     if (!d) return
@@ -219,6 +234,34 @@ function App() {
             </span>
           </label>
 
+          {/* Smart Commerce checkbox */}
+          <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
+            <span className="relative flex-shrink-0">
+              <input
+                type="checkbox"
+                checked={smartCommerce}
+                onChange={(e) => setSmartCommerce(e.target.checked)}
+                className="ps-checkbox"
+              />
+              <svg
+                className={`absolute inset-0 w-5 h-5 pointer-events-none transition-opacity ${smartCommerce ? 'opacity-100' : 'opacity-0'}`}
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden
+              >
+                <path d="M6 10l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[12px] tracking-[0.12em] font-semibold text-[var(--ps-muted)] uppercase group-hover:text-[var(--ps-textSoft)] transition-colors">
+                Smart Commerce
+              </span>
+              <span className="text-[10px] text-[var(--ps-muted)] opacity-60">
+                Adds 7 BD lead time for retailer data requirements
+              </span>
+            </span>
+          </label>
+
           {/* Build timeline day controls */}
           <div className="ps-card p-5">
             <div className="text-[10px] tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase mb-4">
@@ -273,9 +316,23 @@ function App() {
           </div>
         </div>
 
+        {/* TIMELINE WARNING */}
+        {timelineWarning === 'past' && (
+          <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(239,68,68,0.12)] border border-[rgba(239,68,68,0.3)] text-[#F87171] text-sm font-medium flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            This timeline is no longer achievable — the kick-off date has already passed.
+          </div>
+        )}
+        {timelineWarning === 'caution' && (
+          <div className="mb-4 px-5 py-3 rounded-xl bg-[rgba(251,191,36,0.12)] border border-[rgba(251,191,36,0.3)] text-[#FBBF24] text-sm font-medium flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 6v4m0 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Tight timeline — kick-off is within 3 business days.
+          </div>
+        )}
+
         {/* TIMELINE */}
         <section className="grid grid-cols-1 gap-6">
-          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} />
+          <Timeline ref={timelineRef} id={TIMELINE_EXPORT_ID} milestones={milestones} timelineWarning={timelineWarning} />
           <div
             className="flex items-center justify-between px-5 py-4 rounded-xl"
             style={{
@@ -292,6 +349,7 @@ function App() {
               anchorDate={anchorDate}
               dateType={dateType}
               designMode={designMode}
+              smartCommerce={smartCommerce}
             />
           </div>
         </section>
