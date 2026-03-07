@@ -166,13 +166,14 @@
       }
 
       .card__cta {
-        display: inline-flex;
+        display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.8rem;
         font-weight: 700;
         margin-top: 0.5rem;
         letter-spacing: 0.02em;
+        width: 100%;
       }
       .card--pink .card__cta { color: var(--pink); }
       .card--purple .card__cta { color: var(--purple); }
@@ -193,8 +194,7 @@
         border: 1px solid var(--border);
         border-radius: 4px;
         padding: 2px 6px;
-        margin-bottom: 0.25rem;
-        width: fit-content;
+        margin-left: auto;
       }
 
       /* ---- Footer ---- */
@@ -281,14 +281,6 @@
             <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
         </div>
-        <div class="card__external-badge">
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
-          </svg>
-          External tool
-        </div>
         <div class="card__label">Creative</div>
         <div class="card__title">Ad Experience Planner</div>
         <div class="card__desc">Browse PadSquad ad formats, explore features by objective, and build a shareable spec for your next campaign.</div>
@@ -299,6 +291,14 @@
             <polyline points="15 3 21 3 21 9" />
             <line x1="10" y1="14" x2="21" y2="3" />
           </svg>
+          <div class="card__external-badge">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+            External tool
+          </div>
         </div>
       </a>
     </div>
