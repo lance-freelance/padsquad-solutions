@@ -63,9 +63,14 @@ export default function App() {
               </defs>
               <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
             </svg>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-white">
-              AdCanvas<br className="sm:hidden" /> CPM Calculator
-            </h1>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-white">
+                AdCanvas<br className="sm:hidden" /> CPM Calculator
+              </h1>
+              <p className="text-sm sm:text-base font-normal text-[var(--ps-muted)] mt-1.5 leading-snug">
+                See what happens when creative delivery is separated from your media buy.
+              </p>
+            </div>
           </div>
           <div className="ps-tab-bar">
             {TABS.map((tab) => (
@@ -149,6 +154,25 @@ export default function App() {
                 AdCanvas CPM Calculator
               </div>
               <ResultsExport targetRef={resultsRef} activeTab={activeTab} />
+            </div>
+
+            {/* CTA */}
+            <div className="text-center ps-reveal" style={{ animationDelay: '800ms' }}>
+              <p className="text-sm text-[var(--ps-muted)] mb-3">
+                <span className="text-white font-semibold">Ready to decouple?</span>{' '}
+                Talk to our team about modeling this for your specific media plan.
+              </p>
+              <a
+                href="https://padsquad.com/contact-us?utm_source=cpm-calculator&utm_medium=tool&utm_campaign=adcanvas-cpm&utm_content=decouple-cta"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--ps-pink)] border border-[var(--ps-pink)] rounded-lg px-5 py-2.5 hover:bg-[var(--ps-pink)] hover:text-white transition-colors"
+              >
+                Get in Touch
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
             </div>
           </section>
         )}

@@ -18,7 +18,7 @@ export function CalculatorForm({ values, onChange, onReveal, revealed }) {
   return (
     <div className="ps-card p-6 sm:p-8">
       <div className="text-xs tracking-[0.18em] font-bold text-[var(--ps-muted)] uppercase mb-6">
-        Your Current Spend
+        The Legacy Media Model
       </div>
 
       {/* Budget */}
