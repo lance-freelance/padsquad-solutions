@@ -4,15 +4,22 @@ import { EfficiencyResults } from './components/EfficiencyResults'
 import { EcpmTuner } from './components/EcpmTuner'
 import { InvestmentSummary } from './components/InvestmentSummary'
 import { ResultsExport } from './components/ResultsExport'
+import { CaasCalculator } from './components/CaasCalculator'
 import { calculateEfficiency, formatCurrency } from './utils/calculations'
 import { TAB_DEFAULTS } from './utils/config'
 
-const TABS = [
+const MODES = [
+  { id: 'caas', label: 'Ad Canvas CPM Calculator', subtitle: 'Rate card pricing by impression volume.' },
+  { id: 'efficiency', label: 'Efficiency Calculator', subtitle: 'See what happens when creative delivery is separated from your media buy.' },
+]
+
+const EFFICIENCY_TABS = [
   { id: 'display', label: 'Display / Rich Media' },
   { id: 'video', label: 'Video' },
 ]
 
 export default function App() {
+  const [mode, setMode] = useState('caas')
   const [activeTab, setActiveTab] = useState('display')
   const [formValues, setFormValues] = useState({
     display: { ...TAB_DEFAULTS.display },
@@ -40,141 +47,176 @@ export default function App() {
     }, 100)
   }, [])
 
-  const results = useMemo(() => {
-    return calculateEfficiency(values)
-  }, [values])
+  const handleModeChange = useCallback((newMode) => {
+    setMode(newMode)
+    if (newMode === 'efficiency') setRevealed(false)
+  }, [])
+
+  const results = useMemo(() => calculateEfficiency(values), [values])
 
   return (
     <div className="min-h-screen bg-[var(--ps-bg)]">
       <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6">
+        {/* Back link */}
         <a href="/" className="inline-flex items-center gap-1.5 text-xs text-[var(--ps-muted)] hover:text-[var(--ps-pink)] transition-colors mb-4">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M11 7H3M7 3L3 7l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11 7H3M7 3L3 7l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
           Solutions Hub
         </a>
+
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <svg width="36" height="34" viewBox="0 0 43 47" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PadSquad" className="flex-shrink-0">
-              <defs>
-                <linearGradient id="ps-logo-grad" x2="1" y1=".5" y2=".5" gradientUnits="objectBoundingBox">
-                  <stop offset="0" stopColor="#9f6bad"/>
-                  <stop offset="1" stopColor="#ed609d"/>
-                </linearGradient>
-              </defs>
-              <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
-            </svg>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-white">
-                AdCanvas<br className="sm:hidden" /> CPM Calculator
-              </h1>
-              <p className="text-sm sm:text-base font-normal text-[var(--ps-muted)] mt-1.5 leading-snug">
-                See what happens when creative delivery is separated from your media buy.
-              </p>
-            </div>
-          </div>
-          <div className="ps-tab-bar">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                className={
-                  'ps-tab-bar__item' +
-                  (activeTab === tab.id ? ' ps-tab-bar__item--active' : '')
-                }
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <div className="flex items-center gap-4 mb-6">
+          <svg width="36" height="34" viewBox="0 0 43 47" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PadSquad" className="flex-shrink-0">
+            <defs>
+              <linearGradient id="ps-logo-grad" x2="1" y1=".5" y2=".5" gradientUnits="objectBoundingBox">
+                <stop offset="0" stopColor="#9f6bad"/>
+                <stop offset="1" stopColor="#ed609d"/>
+              </linearGradient>
+            </defs>
+            <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-grad)"/>
+          </svg>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-white">
+              AdCanvas<br className="sm:hidden" /> CPM Calculator
+            </h1>
+            <p className="text-sm sm:text-base font-normal text-[var(--ps-muted)] mt-1.5 leading-snug">
+              See what happens when creative delivery is separated from your media buy.
+            </p>
           </div>
         </div>
 
-        {/* Phase 1 — Inputs */}
-        <section className="mb-6">
-          <CalculatorForm
-            values={values}
-            onChange={handleChange}
-            onReveal={handleReveal}
-            revealed={revealed}
-          />
-        </section>
+        {/* ── Top-level mode switcher ─────────────────────────────── */}
+        <div className="flex gap-2 mb-6 p-1 bg-[rgba(255,255,255,0.04)] rounded-2xl border border-[rgba(255,255,255,0.06)]">
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => handleModeChange(m.id)}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all ${
+                mode === m.id
+                  ? 'bg-gradient-to-r from-[var(--ps-pink)] to-[var(--ps-purple)] text-white shadow'
+                  : 'text-[var(--ps-textSoft)] hover:text-white'
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
 
-        {/* Phase 2 — Reveal */}
-        {revealed && results && (
-          <section key={activeTab} ref={revealRef} className="space-y-6">
-            {/* Export capture area */}
-            <div ref={resultsRef} className="space-y-6">
-              {/* Branded header — export only */}
-              <div className="ps-export-only items-center gap-3 px-2 pt-2">
-                <svg width="28" height="26" viewBox="0 0 43 47" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
-                  <defs>
-                    <linearGradient id="ps-logo-exp" x2="1" y1=".5" y2=".5" gradientUnits="objectBoundingBox">
-                      <stop offset="0" stopColor="#9f6bad"/>
-                      <stop offset="1" stopColor="#ed609d"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-exp)"/>
-                </svg>
-                <div>
-                  <div className="text-sm font-bold text-white tracking-[0.04em]">
-                    AdCanvas Efficiency Report
+        {/* ── CaaS Calculator mode ─────────────────────────────────── */}
+        {mode === 'caas' && <CaasCalculator />}
+
+        {/* ── Efficiency Calculator mode ───────────────────────────── */}
+        {mode === 'efficiency' && (
+          <>
+            {/* Format sub-tabs */}
+            <div className="flex justify-end mb-4">
+              <div className="ps-tab-bar">
+                {EFFICIENCY_TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={
+                      'ps-tab-bar__item' +
+                      (activeTab === tab.id ? ' ps-tab-bar__item--active' : '')
+                    }
+                    onClick={() => { setActiveTab(tab.id); setRevealed(false) }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Phase 1 — Inputs */}
+            <section className="mb-6">
+              <CalculatorForm
+                values={values}
+                onChange={handleChange}
+                onReveal={handleReveal}
+                revealed={revealed}
+              />
+            </section>
+
+            {/* Phase 2 — Reveal */}
+            {revealed && results && (
+              <section key={activeTab} ref={revealRef} className="space-y-6">
+                {/* Export capture area */}
+                <div ref={resultsRef} className="space-y-6">
+                  {/* Branded header — export only */}
+                  <div className="ps-export-only items-center gap-3 px-2 pt-2">
+                    <svg width="28" height="26" viewBox="0 0 43 47" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+                      <defs>
+                        <linearGradient id="ps-logo-exp" x2="1" y1=".5" y2=".5" gradientUnits="objectBoundingBox">
+                          <stop offset="0" stopColor="#9f6bad" />
+                          <stop offset="1" stopColor="#ed609d" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M38.17 0H24.75a4.68 4.68 0 0 0-4.68 4.67V42.1a.85.85 0 0 1-.86.86H4.7a.86.86 0 0 1-.85-.85V14.75a.86.86 0 0 1 .85-.85H16.2a1.9 1.9 0 0 0 1.93-1.92v-1.9H4.68A4.68 4.68 0 0 0 0 14.73V42.1a4.68 4.68 0 0 0 4.68 4.68h14.54a4.68 4.68 0 0 0 4.68-4.67V4.68a.86.86 0 0 1 .86-.86h13.42a.86.86 0 0 1 .85.87v26.57a.85.85 0 0 1-.85.84H27.76A1.92 1.92 0 0 0 25.84 34v1.9h12.33a4.68 4.68 0 0 0 4.68-4.65V4.66A4.68 4.68 0 0 0 38.18 0z" fill="url(#ps-logo-exp)" />
+                    </svg>
+                    <div>
+                      <div className="text-sm font-bold text-white tracking-[0.04em]">
+                        AdCanvas Efficiency Report
+                      </div>
+                      <div className="text-[10px] text-[var(--ps-muted)] tracking-[0.06em]">
+                        {tabLabel} · {formatCurrency(Number(values.budget) || 0)} Budget
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[var(--ps-muted)] tracking-[0.06em]">
-                    {tabLabel} · {formatCurrency(Number(values.budget) || 0)} Budget
+
+                  <EfficiencyResults results={results} budget={values.budget} />
+
+                  {/* Tuner — hidden during export */}
+                  <div className="ps-hide-on-export">
+                    <EcpmTuner
+                      values={values}
+                      onChange={handleChange}
+                      showAdvanced={showAdvanced}
+                      onToggleAdvanced={() => setShowAdvanced((p) => !p)}
+                      vendorCpm={values.vendorCpm}
+                    />
+                  </div>
+
+                  <InvestmentSummary results={results} />
+
+                  {/* Branded footer — export only */}
+                  <div className="ps-export-only justify-center py-3">
+                    <span className="text-[10px] text-[var(--ps-muted)] tracking-[0.1em] uppercase">
+                      Powered by PadSquad AdCanvas™
+                    </span>
                   </div>
                 </div>
-              </div>
 
-              <EfficiencyResults results={results} budget={values.budget} />
+                {/* Footer bar */}
+                <div className="ps-footer-bar ps-reveal" style={{ animationDelay: '700ms' }}>
+                  <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase">
+                    AdCanvas Efficiency Summary Download
+                  </div>
+                  <ResultsExport targetRef={resultsRef} activeTab={activeTab} />
+                </div>
 
-              {/* Tuner — hidden during export */}
-              <div className="ps-hide-on-export">
-                <EcpmTuner
-                  values={values}
-                  onChange={handleChange}
-                  showAdvanced={showAdvanced}
-                  onToggleAdvanced={() => setShowAdvanced((p) => !p)}
-                  vendorCpm={values.vendorCpm}
-                />
-              </div>
-
-              <InvestmentSummary results={results} />
-
-              {/* Branded footer — export only */}
-              <div className="ps-export-only justify-center py-3">
-                <span className="text-[10px] text-[var(--ps-muted)] tracking-[0.1em] uppercase">
-                  Powered by PadSquad AdCanvas™
-                </span>
-              </div>
-            </div>
-
-            {/* Footer bar */}
-            <div className="ps-footer-bar ps-reveal" style={{ animationDelay: '700ms' }}>
-              <div className="text-[11px] tracking-[0.14em] font-semibold text-[var(--ps-muted)] uppercase">
-                AdCanvas CPM Calculator
-              </div>
-              <ResultsExport targetRef={resultsRef} activeTab={activeTab} />
-            </div>
-
-            {/* CTA */}
-            <div className="text-center ps-reveal" style={{ animationDelay: '800ms' }}>
-              <p className="text-sm text-[var(--ps-muted)] mb-3">
-                <span className="text-white font-semibold">Ready to get more from your media?</span>{' '}
-                Talk to our team about modeling this efficiency for your specific media plan.
-              </p>
-              <a
-                href="https://padsquad.com/contact-us?utm_source=cpm-calculator&utm_medium=tool&utm_campaign=adcanvas-cpm&utm_content=decouple-cta"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--ps-pink)] border border-[var(--ps-pink)] rounded-lg px-5 py-2.5 hover:bg-[var(--ps-pink)] hover:text-white transition-colors"
-              >
-                Get in Touch
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-          </section>
+                {/* CTA */}
+                <div className="text-center ps-reveal" style={{ animationDelay: '800ms' }}>
+                  <p className="text-sm text-[var(--ps-muted)] mb-3">
+                    <span className="text-white font-semibold">Ready to get more from your media?</span>{' '}
+                    Talk to our team about modeling this efficiency for your specific media plan.
+                  </p>
+                  <a
+                    href="https://padsquad.com/contact-us?utm_source=cpm-calculator&utm_medium=tool&utm_campaign=adcanvas-cpm&utm_content=decouple-cta"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--ps-pink)] border border-[var(--ps-pink)] rounded-lg px-5 py-2.5 hover:bg-[var(--ps-pink)] hover:text-white transition-colors"
+                  >
+                    Get in Touch
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </section>
+            )}
+          </>
         )}
       </main>
     </div>

@@ -77,10 +77,43 @@ export function formatCpm(n) {
   return '$' + Number(n).toFixed(2)
 }
 
+/**
+ * CaaS Rate Card Calculator — given format + impressions + add-ons, returns cost breakdown.
+ */
+export function calculateCaas({ format, impressions, advancedTech }, rateCard) {
+  const fmt = rateCard.formats.find((f) => f.id === format)
+  if (!fmt || !impressions || impressions <= 0) return null
+
+  const baseCpm = fmt.baseCpm
+  const isDisplay = fmt.type === 'display'
+
+  // Find highest applicable volume tier
+  let activeTierIdx = -1
+  rateCard.volumeTiers.forEach((t, i) => {
+    if (impressions >= t.threshold) activeTierIdx = i
+  })
+
+  let effectiveCpm = baseCpm
+  let discountPct = 0
+  let tierLabel = null
+  if (activeTierIdx >= 0) {
+    const tier = rateCard.volumeTiers[activeTierIdx]
+    effectiveCpm = isDisplay ? tier.displayCpm : tier.videoCpm
+    discountPct = tier.discount
+    tierLabel = formatCompact(tier.threshold) + '+ tier'
+  }
+
+  const addonCpm = advancedTech ? rateCard.advancedTechCpm : 0
+  const yourCpm = effectiveCpm + addonCpm
+  const totalCost = (impressions / 1000) * yourCpm
+
+  return { baseCpm, discountPct, effectiveCpm, addonCpm, yourCpm, totalCost, tierLabel, activeTierIdx }
+}
+
 export function formatCompact(n) {
   if (n == null || isNaN(n)) return '—'
-  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B'
-  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M'
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K'
+  if (n >= 1e9) return parseFloat((n / 1e9).toFixed(2)) + 'B'
+  if (n >= 1e6) return parseFloat((n / 1e6).toFixed(2)) + 'M'
+  if (n >= 1e3) return Math.round(n / 1e3) + 'K'
   return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
 }
